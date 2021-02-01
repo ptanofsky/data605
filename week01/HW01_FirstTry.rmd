@@ -1,21 +1,19 @@
 ---
-title: "HW01_FirstTry.rmd"
+title: "DATA 605: Homework 1"
 author: "Philip Tanofsky"
 date: "1/30/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+## Prompt
 
-## R Markdown
+For this assignment, build the first letters for both your first and last name using point plots in R.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Then, write R code that will left multiply (%>%) a square matrix (x) against each of the vectors of points (y). Initially, that square matrix will be the Identity matrix.  
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Use a loop that changes the transformation matrix incrementally to demonstrate 1) shear, 2) scaling, 3)  rotation, and 4) projection in animated fashion.  
 
-```{r}
+```{r eval=F}
 # PT
 x=c(rep(-1,500), seq(-1,0,length.out=1000), seq(-1,0,length.out=1000),
     rep(0,250), seq(0.25,.75,length.out=500), rep(.75,1000), seq(.75,1.25,length.out=500))
@@ -33,15 +31,15 @@ y=c(seq(-1,1,length.out=500), rep(0,1000), rep(1,1000), seq(0,1,length.out=250),
 
 z=rbind(x,y)
 
+# Confirm the 'PT' is showing based on prompt code
 plot(y~x, xlim=c(-3,3), ylim=c(-3,3))
 
 # Create Identify Matrix
-identity_matrix <- diag(2)
-
-# transform_matrix
+trans_matrix <- diag(2)
 
 # Multiply Identity matrix by the vector of points
-result <- identity_matrix %*% z
+# Realistically, the base identity matrix does not modify the vector of points
+result <- trans_matrix %*% z
 
 x11(title="Animation")
 
@@ -49,13 +47,14 @@ x11(title="Animation")
 # Display resulting plot, should be same as the initial plot
 plot(result[2,]~result[1,], xlim=c(-10,10), ylim=c(-10,10))
 
+# Add sleep so the animation will be easier to watch
 Sys.sleep(1)
 
 # Create matrix for shear
-shear_matrix = matrix(
+trans_matrix <- matrix(
   c(1, 0, 1.2, 1), nrow=2, ncol=2) 
 
-result <- shear_matrix %*% z
+result <- trans_matrix %*% z
 
 # Display resulting plot, should be shear plot
 plot(result[2,]~result[1,], xlim=c(-10,10), ylim=c(-10,10))
@@ -63,10 +62,10 @@ plot(result[2,]~result[1,], xlim=c(-10,10), ylim=c(-10,10))
 Sys.sleep(1)
 
 # Create matrix for scale
-scale_matrix = matrix(
+trans_matrix <- matrix(
   c(2, 0, 0, 2), nrow=2, ncol=2) 
 
-result <- scale_matrix %*% result
+result <- trans_matrix %*% result
 
 # Display resulting plot, should be scale plot
 plot(result[2,]~result[1,], xlim=c(-10,10), ylim=c(-10,10))
@@ -74,31 +73,75 @@ plot(result[2,]~result[1,], xlim=c(-10,10), ylim=c(-10,10))
 Sys.sleep(1)
 
 # Create matrix for rotation (90 degrees counterclockwise)
-rotate_matrix = matrix(
+trans_matrix <- matrix(
   c(0, 1, -1, 0), nrow=2, ncol=2) 
 
-result <- rotate_matrix %*% result
+result <- trans_matrix %*% result
 
 # Display resulting plot, should be rotate plot
 plot(result[2,]~result[1,], xlim=c(-10,10), ylim=c(-10,10))
 
 Sys.sleep(1)
 
-# Create z for projection
-#z=c(rep(1,2000))
-
-#result <- rbind(result, z)
-
-# Create matrix for projection (vertical projection in the x axis)
-#project_matrix = matrix(
-#  c(1, 0, 1, 0, 1, 0, 0, 0, 0), nrow=3, ncol=3) 
-
-project_matrix = matrix(
+# Create matrix for projection (projection on the y axis)
+trans_matrix <- matrix(
   c(0, 1, 0, 1), nrow=2, ncol=2) 
 
-result <- project_matrix %*% result
+result <- trans_matrix %*% result
 
 # Display resulting plot, should be projection plot
 plot(result[2,]~result[1,], xlim=c(-10,10), ylim=c(-10,10))
 
+```
+
+## Looping
+
+``` {r}
+# PT
+x=c(rep(-1,500), seq(-1,0,length.out=1000), seq(-1,0,length.out=1000),
+    rep(0,250), seq(0.25,.75,length.out=500), rep(.75,1000), seq(.75,1.25,length.out=500))
+
+y=c(seq(-1,1,length.out=500), rep(0,1000), rep(1,1000), seq(0,1,length.out=250), 
+    rep(1,500), seq(-1,1,length.out=1000), rep(1,500))
+
+z=rbind(x,y)
+
+# Confirm the 'PT' is showing based on prompt code
+plot(y~x, xlim=c(-3,3), ylim=c(-3,3))
+
+# Create Identity Matrix
+id_matrix <- diag(2)
+
+# Create matrix for shear
+shear_matrix <- matrix(c(1, 0, 1.2, 1), nrow=2, ncol=2) 
+
+# Create matrix for scale
+scale_matrix <- matrix(c(2, 0, 0, 2), nrow=2, ncol=2)
+
+# Create matrix for rotation (90 degrees counterclockwise)
+rot_matrix <- matrix(c(0, 1, -1, 0), nrow=2, ncol=2) 
+
+# Create matrix for projection (projection on the y axis)
+# Projection of 2D to 1D
+proj_matrix <- matrix(c(0, 1, 0, 1), nrow=2, ncol=2)
+
+# Make list of the transformation matrices to allow for looping
+transforms <- list(id_matrix, shear_matrix, scale_matrix, rot_matrix, proj_matrix)
+
+# Use x11 for Animation
+x11(title="Animation")
+
+# Loop the transformation matrices
+# 5 displays total
+for (idx in 1:5) {
+  
+  # Matrix multiple (apply transformation)
+  z <- transforms[[idx]] %*% z
+  
+  # Display resulting plot
+  plot(z[2,]~z[1,], xlim=c(-10,10), ylim=c(-10,10))
+  
+  # Add sleep so the animation will be easier to watch
+  Sys.sleep(0.5)
+}
 ```
