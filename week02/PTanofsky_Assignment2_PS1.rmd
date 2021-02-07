@@ -1,0 +1,226 @@
+---
+title: "Problem Set 1"
+subtitle: "DATA 605, Spring 2021: Assignment 2"
+author: "Philip Tanofsky"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: pdf_document
+---
+
+# Prompt
+
+1. Show that $A^TA \neq AA^T$ in general. (Proof and demonstration.)
+
+2. For a special type of square matrix $A$, we get $A^TA = AA^T$. Under what conditions
+could this be true? (Hint: The Identity matrix I is an example of such a matrix).
+
+## Part 1
+
+Proof of $AA^T \neq A^TA$ in general.
+
+In essence, prove matrix multiplication is not commutative. First, given a matrix $A$ with size $m \times n$, if $m \neq n$, then $AA^T$ would result in a $m \times m$ matrix while $A^TA$ would result in a $n \times n$ matrix. The resulting matrices are different sizes, and thus not equal.
+
+### Proof
+
+Now to prove $A^TA \neq AA^T$ in general for a square matrix.
+
+Given a matrix
+
+$$
+A = 
+\begin{bmatrix}
+    a & b \\
+    c & d \\
+\end{bmatrix}
+$$
+With a transpose as
+$$
+A^T = 
+\begin{bmatrix}
+    a & c \\
+    b & d \\
+\end{bmatrix}
+$$
+
+Matrix multiply $AA^T$
+
+$$
+AA^T = 
+\begin{bmatrix}
+    a^2+b^2 & ac+bd \\
+    ac+bd & c^2+d^2 \\
+\end{bmatrix}
+$$
+
+Matrix multiply $A^TA$
+
+$$
+A^TA = 
+\begin{bmatrix}
+    a^2+c^2 & ab+cd \\
+    ab+cd & b^2+d^2 \\
+\end{bmatrix}
+$$
+
+Thus
+
+$$
+\begin{bmatrix}
+    a^2+b^2 & ac+bd \\
+    ac+bd & c^2+d^2 \\
+\end{bmatrix}
+\neq
+\begin{bmatrix}
+    a^2+c^2 & ab+cd \\
+    ab+cd & b^2+d^2 \\
+\end{bmatrix}
+$$
+
+### Demonstration
+
+$$
+A = 
+\begin{bmatrix}
+    1 & 3 \\
+    2 & 4 \\
+\end{bmatrix}
+$$
+With a transpose as
+$$
+A^T = 
+\begin{bmatrix}
+    1 & 2 \\
+    3 & 4 \\
+\end{bmatrix}
+$$
+
+Matrix multiply $AA^T$
+
+$$
+AA^T = 
+\begin{bmatrix}
+    10 & 14 \\
+    14 & 20 \\
+\end{bmatrix}
+$$
+
+Matrix multiply $A^TA$
+
+$$
+A^TA = 
+\begin{bmatrix}
+    5 & 11 \\
+    11 & 25 \\
+\end{bmatrix}
+$$
+
+Thus
+
+$$
+\begin{bmatrix}
+    10 & 14 \\
+    14 & 20 \\
+\end{bmatrix}
+\neq
+\begin{bmatrix}
+    5 & 11 \\
+    11 & 25 \\
+\end{bmatrix}
+$$
+
+#### Validation with R
+
+```{r}
+a = matrix(c(1,2,3,4), 2, 2)
+at = matrix(c(1,3,2,4), 2, 2)
+
+a
+
+at
+
+aat <- a %*% at
+
+ata <- at %*% a
+
+aat
+
+ata
+
+(aat == ata)
+```
+
+## Part 2
+
+Under what conditions is $AA^T = A^TA$?
+
+Answer: When matrix $A$ is **symmetric**. Thus $A = A^T$. And then, with substitution $AA = AA$.
+
+$$
+A = 
+\begin{bmatrix}
+    1 & 2 \\
+    2 & 4 \\
+\end{bmatrix}
+$$
+With a transpose as
+$$
+A^T = 
+\begin{bmatrix}
+    1 & 2 \\
+    2 & 4 \\
+\end{bmatrix}
+$$
+
+Matrix multiply $AA^T$
+
+$$
+AA^T = 
+\begin{bmatrix}
+    5 & 10 \\
+    10 & 20 \\
+\end{bmatrix}
+$$
+
+Matrix multiply $A^TA$
+
+$$
+A^TA = 
+\begin{bmatrix}
+    5 & 10 \\
+    10 & 20 \\
+\end{bmatrix}
+$$
+
+Thus
+
+$$
+\begin{bmatrix}
+    5 & 10 \\
+    10 & 20 \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+    5 & 10 \\
+    10 & 20 \\
+\end{bmatrix}
+$$
+
+#### Validation with R
+
+```{r}
+a = matrix(c(1,2,2,4), 2, 2)
+at = matrix(c(1,2,2,4), 2, 2)
+
+a
+
+at
+
+aat <- a %*% at
+
+ata <- at %*% a
+
+aat
+
+ata
+
+(aat == ata)
+```
