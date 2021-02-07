@@ -96,7 +96,7 @@ plot(result[2,]~result[1,], xlim=c(-10,10), ylim=c(-10,10))
 
 ## Looping
 
-``` {r}
+``` {r eval=F}
 # PT
 x=c(rep(-1,500), seq(-1,0,length.out=1000), seq(-1,0,length.out=1000),
     rep(0,250), seq(0.25,.75,length.out=500), rep(.75,1000), seq(.75,1.25,length.out=500))
@@ -144,4 +144,75 @@ for (idx in 1:5) {
   # Add sleep so the animation will be easier to watch
   Sys.sleep(0.5)
 }
+```
+
+```{r}
+library(animation)
+
+# PT
+x=c(rep(-1,500), seq(-1,0,length.out=1000), seq(-1,0,length.out=1000),
+    rep(0,250), seq(0.25,.75,length.out=500), rep(.75,1000), seq(.75,1.25,length.out=500))
+
+y=c(seq(-1,1,length.out=500), rep(0,1000), rep(1,1000), seq(0,1,length.out=250), 
+    rep(1,500), seq(-1,1,length.out=1000), rep(1,500))
+
+# H (from prompt)
+#x=c(rep(0,500), seq(0,1,length.out=1000), rep(1,500))
+#y=c(seq(-1,1,length.out=500), rep(0,1000), seq(-1,1,length.out=500))
+z=rbind(x,y)
+
+# Confirm the 'PT' is showing based on prompt code
+plot(y~x, xlim=c(-3,3), ylim=c(-3,3))
+
+dev.control('enable')
+
+anim = ani.record(reset = T, replay.cur = F)
+
+# Create display window for animation
+x11()
+
+# Create 2x2 identity matrix
+a=diag(2) 
+# Scale
+for (i in seq(-3,3, length.out=20)) {
+  a[1,1] = i
+  a[2,2] = i
+  mod_mat = apply(z, 2, function(x) a%*%x)
+  plot(mod_mat[2,]~mod_mat[1,], xlim=c(-3,3), ylim=c(-3,3))
+  ani.record()
+}
+
+# Create 2x2 identity matrix
+a=diag(2) 
+# Shear
+for (i in seq(-3,3, length.out=20)) {
+  a[1,2] = i
+  mod_mat = apply(z, 2, function(x) a%*%x)
+  plot(mod_mat[2,]~mod_mat[1,], xlim=c(-3,3), ylim=c(-3,3))
+  ani.record()
+}
+
+# Create 2x2 identity matrix
+a=diag(2) 
+# Project on X axis (while X value scales)
+for (i in seq(-3,3, length.out=100)) {
+#  a[1,1] = i
+  a[2,2] = i
+  mod_mat = apply(z, 2, function(x) a%*%x)
+  plot(mod_mat[2,]~mod_mat[1,], xlim=c(-3,3), ylim=c(-3,3))
+  ani.record()
+}
+
+rotate_func=function(x){matrix(c(cos(x), -sin(x), sin(x), cos(x)), byrow=T, nrow=2)}
+
+# Create 2x2 identity matrix
+a=diag(2) 
+# Rotate
+for (i in seq(0,2, length.out=20)) {
+  a=rotate_func(i)
+  mod_mat = apply(z, 2, function(x) a%*%x)
+  plot(mod_mat[2,]~mod_mat[1,], xlim=c(-3,3), ylim=c(-3,3))
+  ani.record()
+}
+
 ```
