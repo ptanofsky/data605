@@ -1,0 +1,452 @@
+---
+title: "DATA 605: Assignment 3"
+subtitle: "Semester: Spring 2021; Professor Doc Larry"
+author: "Philip Tanofsky"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: pdf_document
+---
+
+# Problem Set 1
+
+## Part 1
+
+What is the rank of the matrix $A$?
+
+$$
+A = 
+\begin{bmatrix}
+    1  & 2 &  3 &  4 \\
+    -1 & 0 &  1 &  3 \\
+     0 & 1 & -2 &  1 \\
+     5 & 4 & -2 & -3 \\
+\end{bmatrix}
+$$
+
+To find the rank of matrix $A$, the matrix needs to be converted to row echelon form to find the count of linearly-independent rows.
+
+Step 1:
+
+- Multiply $R_1$ by 1 and add to $R_2$
+
+- Multiple $R_1$ by -5 and add to $R_4$
+
+$$
+A = 
+\begin{bmatrix}
+    1 &  2 &   3 &   4 \\
+    0 &  2 &   4 &   7 \\
+    0 &  1 &  -2 &   1 \\
+    0 & -6 & -17 & -23 \\
+\end{bmatrix}
+$$
+
+Step 2:
+
+- Multiply $R_2$ by $\frac{1}{2}$
+
+$$
+A = 
+\begin{bmatrix}
+    1 &  2 &   3 &   4 \\
+    0 &  1 &   2 &   7/2 \\
+    0 &  1 &  -2 &   1 \\
+    0 & -6 & -17 & -23 \\
+\end{bmatrix}
+$$
+
+Step 3:
+
+- Multiply $R_2$ by -1 and add to $R_3$
+
+- Multiple $R_1$ by 6 and add to $R_4$
+$$
+A = 
+\begin{bmatrix}
+    1 & 2 &  3 &  4 \\
+    0 & 1 &  2 &  7/2 \\
+    0 & 0 & -4 & -5/2 \\
+    0 & 0 & -5 & -2 \\
+\end{bmatrix}
+$$
+Step 4:
+
+- Multiply $R_3$ by $-\frac{1}{4}$
+$$
+A = 
+\begin{bmatrix}
+    1 & 2 &  3 &  4 \\
+    0 & 1 &  2 &  7/2 \\
+    0 & 0 &  1 & 5/8 \\
+    0 & 0 & -5 & -2 \\
+\end{bmatrix}
+$$
+Step 5:
+
+- Multiply $R_3$ by 5 and add to $R_4$
+$$
+A = 
+\begin{bmatrix}
+    1 & 2 &  3 &  4 \\
+    0 & 1 &  2 &  7/2 \\
+    0 & 0 &  1 & 5/8 \\
+    0 & 0 &  0 & 9/8 \\
+\end{bmatrix}
+$$
+Step 6:
+
+- Multiply $R_3$ by $\frac{8}{9}$
+$$
+A = 
+\begin{bmatrix}
+    1 & 2 &  3 &  4 \\
+    0 & 1 &  2 &  7/2 \\
+    0 & 0 &  1 & 5/8 \\
+    0 & 0 &  0 & 1 \\
+\end{bmatrix}
+$$
+Result: 4 linearly-independent rows, thus the rank is 4.
+
+## Part 2
+
+Given an $m \times n$ matrix where $m>n$, what can be the maximum rank? The minimum rank, assuming that the matrix is non-zero?
+
+Answer: Maximum rank possible is $n$. Minimum rank possible is 1, assuming matrix is non-zero.
+
+## Part 3
+
+What is the rank of matrix $B$?
+
+$$
+B = 
+\begin{bmatrix}
+    1 & 2 & 1 \\
+    3 & 6 & 3 \\
+    2 & 4 & 2 \\
+\end{bmatrix}
+$$
+Because ...
+
+- $-R_1 + R_2 = R_3$
+- $R_1 + R_3 = R_2$
+
+$R_2$ and $R_3$ are not linearly independent.
+
+Thus, there is only 1 linearly-independent row, so the rank is 1.
+
+# Problem Set 2
+
+Compute the eigenvalues and eigenvectors of the matrix $A$. You’ll need to show your
+work. You’ll need to write out the characteristic polynomial and show your solution.
+
+$$
+A = 
+\begin{bmatrix}
+    1 & 2 & 3 \\
+    0 & 4 & 5 \\
+    0 & 0 & 6 \\
+\end{bmatrix}
+$$
+Thus, $P_f(x) = det(F-xI_3)$, which is applied to matrix $A$ is
+$$
+= 
+\begin{bmatrix}
+    1-x & 2 & 3 \\
+    0 & 4-x & 5 \\
+    0 & 0 & 6-x \\
+\end{bmatrix}
+$$
+Taking the determinant, and then simplified
+
+$=(1-x)((4-x)(6-x)-0(5)) + 0 + 0$
+
+$=(1-x)(24-6x-4x+x^2-0)+0$
+
+$=(1-x)(x^2-10x+24)$
+
+$=x^2-10x+24-x^3+10x^2-24x$
+
+$=-x^3+11x^2-34x+24x$
+
+Then solving for 0
+
+$-(x-1)(x^2-10x+24)=0$
+
+$-(x-1)(x-6)(x-4)=0$
+
+$-(x-1)(x-6)(x-4)=0$
+
+$x=1$ or $x=6$ or $x=4$
+
+Eigenvalues are 1, 4, 6
+
+
+
+To solve for the eigenvectors
+
+$$
+\begin{bmatrix}
+    1-\lambda & 2 & 3 \\
+    0 & 4-\lambda & 5 \\
+    0 & 0 & 6-\lambda \\
+\end{bmatrix}
+$$
+
+Solve for $\lambda = 1$
+
+$$
+\begin{bmatrix}
+    0 & 2 & 3 \\
+    0 & 3 & 5 \\
+    0 & 0 & 5 \\
+\end{bmatrix}
+$$
+
+- Multiply $R_1$ by $\frac{1}{2}$
+
+$$
+\begin{bmatrix}
+    0 & 1 & 3/2 \\
+    0 & 3 & 5 \\
+    0 & 0 & 5 \\
+\end{bmatrix}
+$$
+
+- Multiply $R_1$ by -3 and add to $R_2$
+
+$$
+\begin{bmatrix}
+    0 & 1 & 3/2 \\
+    0 & 0 & 1/2 \\
+    0 & 0 & 5 \\
+\end{bmatrix}
+$$
+
+- Multiply $R_2$ by -10 and add to $R_3$
+
+$$
+\begin{bmatrix}
+    0 & 1 & 3/2 \\
+    0 & 0 & 1/2 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+$$
+
+- Multiply $R_2$ by -3 and add to $R_1$
+
+- Multiply $R_2$ by 2
+
+$$
+\begin{bmatrix}
+    0 & 1 & 0 \\
+    0 & 0 & 1 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+$$
+
+Now, to find the eigenvector
+$$
+\begin{bmatrix}
+    0 & 1 & 0 \\
+    0 & 0 & 1 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+    v_1 \\
+    v_2 \\
+    v_3 \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+    0 \\
+    0 \\
+    0 \\
+\end{bmatrix}
+$$
+
+- From above, $v_2 = 0$
+
+- From above, $v_3 = 0$
+
+- From above, $v_1 = v_1$ and then just replace with $1$, $v_1 = 1$
+
+$$
+\textbf{v}=
+\begin{bmatrix}
+    1 \\
+    0 \\
+    0 \\
+\end{bmatrix}
+for
+\lambda
+=1
+$$
+Solve for $\lambda = 4$
+
+$$
+\begin{bmatrix}
+    -3 & 2 & 3 \\
+    0 & 0 & 5 \\
+    0 & 0 & 2 \\
+\end{bmatrix}
+$$
+
+- Multiply $R_1$ by $-\frac{1}{3}$
+
+$$
+\begin{bmatrix}
+    1 & -2/3 & -1 \\
+    0 & 0 & 5 \\
+    0 & 0 & 2 \\
+\end{bmatrix}
+$$
+
+- Multiply $R_1$ by 5 and add to $R_2$
+
+$$
+\begin{bmatrix}
+    1 & -2/3 & -1 \\
+    0 & 0 & 1 \\
+    0 & 0 & 2 \\
+\end{bmatrix}
+$$
+
+- Multiply $R_2$ by -2 and add to $R_3$
+
+$$
+\begin{bmatrix}
+    1 & -2/3 & -1 \\
+    0 & 0 & 1 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+$$
+
+- Add $R_2$ to $R_1$
+
+$$
+\begin{bmatrix}
+    1 & -2/3 & 0 \\
+    0 & 0 & 1 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+$$
+
+Now, to find the eigenvector
+$$
+\begin{bmatrix}
+    1 & -2/3 & 0 \\
+    0 & 0 & 1 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+    v_1 \\
+    v_2 \\
+    v_3 \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+    0 \\
+    0 \\
+    0 \\
+\end{bmatrix}
+$$
+
+- From above, $v_1 -\frac{2}{3}v_2=0$
+
+- thus, $v_1=\frac{2}{3}v_2$
+
+- From above, $v_3=0$
+
+- From above, $v_2=v_2$ and then just replace with $1$, $v_2 = 1$
+
+$$
+\textbf{v}
+=
+\begin{bmatrix}
+    2/3 \\
+    1 \\
+    0 \\
+\end{bmatrix}
+for \lambda 
+= 4
+$$
+Solve for $\lambda = 6$
+
+$$
+\begin{bmatrix}
+    -5 & 2 & 3 \\
+    0 & -2 & 5 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+$$
+
+- Multiply $R_1$ by $-\frac{1}{5}$
+
+$$
+\begin{bmatrix}
+    1 & -2/5 & -3/5 \\
+    0 & -2 & 5 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+$$
+
+- Multiply $R_2$ by $-\frac{1}{2}$
+
+$$
+\begin{bmatrix}
+    1 & -2/5 & -3/5 \\
+    0 & 1 & -5/2 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+$$
+
+- Multiply $R_2$ by $\frac{2}{5}$ and add to $R_1$
+
+$$
+\begin{bmatrix}
+    1 & 0 & -8/5 \\
+    0 & 1 & -5/2 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+$$
+
+Now, to find the eigenvector
+$$
+\begin{bmatrix}
+    1 & 0 & -8/5 \\
+    0 & 1 & -5/2 \\
+    0 & 0 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+    v_1 \\
+    v_2 \\
+    v_3 \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+    0 \\
+    0 \\
+    0 \\
+\end{bmatrix}
+$$
+
+- From above, $v_1 -\frac{8}{5}v_3=0$
+
+- thus, $v_1=\frac{8}{5}v_3$
+
+- From above, $v_2-\frac{5}{2}v_3=0$
+
+- thus, $v_2=\frac{5}{2}v_3$
+
+- From above, $v_3=v_3$ and then just replace with $1$, $v_3 = 1$
+
+$$
+\textbf{v}
+=
+\begin{bmatrix}
+    8/5 \\
+    5/2 \\
+    1 \\
+\end{bmatrix}
+for \lambda 
+= 6
+$$
