@@ -13,7 +13,8 @@ Starting point: https://rpubs.com/R-Minator/eigenshoes
 ```{r}
 # Libraries
 library(jpeg)
-library(ramify)
+library(EBImage)
+library(OpenImageR)
 ```
 
 ## Use of Graphics
@@ -25,7 +26,7 @@ Add graphics to the data set.
 num <- 17
 files <- list.files("/Users/philiptanofsky/Documents/School/CUNY/MSDS/Courses/DATA605/Week04/jpg/", pattern="\\.jpg")[1:num]
 
-files
+#files
 ```
 
 ## View Shoes Function
@@ -37,12 +38,14 @@ width <- 2500
 scale <- 20
 
 plot_jpeg <- function(path, add=FALSE) {
-  
-  jpg <- readJPEG(path, native=T) # Read the file
-  res <- dim(jpg)[2:1] # Get the resolution, [x, y]
-  if (!add) { # Initialize any empty plot are if add == False
+  # Read the file
+  jpg <- readJPEG(path, native=T)
+  # Get the resolution, [x, y]
+  res <- dim(jpg)[2:1]
+  # Initialize any empty plot are if add == False
+  if (!add) {
     plot(1, 1, xlim=c(1, res[1]), ylim=c(1, res[2]), asp=1, type='n', 
-         xaxs='i', yaxs='i', xaxt='n', yaxt='n', xlab='', bty='n')
+         xaxs='i', yaxs='i', xaxt='n', yaxt='n', xlab='', ylab='', bty='n')
     rasterImage(jpg, 1, 1, res[1], res[2])
   }
 }
@@ -100,19 +103,19 @@ std.shoe <- attr(scaled, "scaled:scale") # saving for classification ... later
 ```{r}
 sigma_ <- cor(scaled)
 
-sigma_
+#sigma_
 ```
 
 ## Get the eigencomponents
 
-```{r eval=F}
+```{r}
 myeigen <- eigen(sigma_)
 cumsum(myeigen$values) / sum(myeigen$values)
 ```
 
 ## Eigen shoes
 
-```{r eval=F}
+```{r}
 scaling <- diag(myeigen$values[1:5]^(-1/2)) / (sqrt(nrow(scaled)-1))
 eigenshoes <- scaled %*% myeigen$vectors[,1:5] %*% scaling
 imageShow(array(eigenshoes[,1], c(60, 125, 3)))
@@ -122,7 +125,7 @@ imageShow(array(eigenshoes[,1], c(60, 125, 3)))
 
 Transform the images
 
-```{r eval=F}
+```{r}
 # Generate variables
 height <- 1200
 width <- 2500
@@ -136,20 +139,20 @@ mypca <- princomp(t(as.matrix(newdata)), scores=TRUE, cor=TRUE)
 
 Generate Eigenshoes
 
-```{r eval=F}
+```{r}
 mypca2 <- t(mypca$scores)
 dim(mypca2) <- c(length(files), height/scale, width/scale, 3)
 par(mfrow=c(5,5))
 par(mai=c(.001, .001, .001, .001))
 # Plot the first 20 eigenshoes only
-for (i in 1:20) {
+for (i in 1:num) {
   plot_jpeg(writeJPEG(mypca2[i,,,], bg="white")) # Complete without reduction
 }
 ```
 
 ## Variance Capture
 
-```{r eval=F}
+```{r}
 a <- round(mypca$sdev[1:num]^2 / sum(mypca$sdev^2), 3)
 cumsum(a)
 ```
