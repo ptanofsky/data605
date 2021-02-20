@@ -10,7 +10,7 @@ output: pdf_document
 
 Starting point: https://rpubs.com/R-Minator/eigenshoes
 
-```{r}
+```{r warning=F,message=F}
 # Libraries
 library(jpeg)
 library(EBImage)
@@ -21,21 +21,30 @@ library(OpenImageR)
 
 Add graphics to the data set.
 
-```{r}
+```{r warning=F,message=F}
 # Prepare for Image Processing
-num <- 17
-files <- list.files("/Users/philiptanofsky/Documents/School/CUNY/MSDS/Courses/DATA605/Week04/jpg/", pattern="\\.jpg")[1:num]
 
-#files
+# Set constant for number of images to be processed
+num_of_images <- 17
+
+# Directory containing the images
+img_dir <- "/Users/philiptanofsky/Documents/School/CUNY/MSDS/Courses/DATA605/Week04/jpg/"
+
+# Read in the list of file names ending in ".jpg" from the directory
+# These are images provided by the professor
+files <- list.files(img_dir, pattern="\\.jpg")[1:num_of_images]
+
+#files: Contains the list of jpg file names
 ```
 
 ## View Shoes Function
 
-```{r}
-# Set Adjustment Parameters
+```{r warning=F,message=F}
+# Set Adjustment Parameters (default values)
 height <- 1200
 width <- 2500
 scale <- 20
+colors <- 3 # Constant represents R,G,B colors of the jpg images
 
 plot_jpeg <- function(path, add=FALSE) {
   # Read the file
@@ -44,63 +53,100 @@ plot_jpeg <- function(path, add=FALSE) {
   res <- dim(jpg)[2:1]
   # Initialize any empty plot are if add == False
   if (!add) {
-    plot(1, 1, xlim=c(1, res[1]), ylim=c(1, res[2]), asp=1, type='n', 
-         xaxs='i', yaxs='i', xaxt='n', yaxt='n', xlab='', ylab='', bty='n')
-    rasterImage(jpg, 1, 1, res[1], res[2])
+    plot(1, 
+         1, 
+         xlim=c(1, res[1]), 
+         ylim=c(1, res[2]), 
+         asp=1, 
+         type='n', 
+         xaxs='i', 
+         yaxs='i', 
+         xaxt='n', 
+         yaxt='n', 
+         xlab='', 
+         ylab='', 
+         bty='n')
+    rasterImage(jpg, 
+                1, 
+                1, 
+                res[1], 
+                res[2])
   }
 }
 ```
 
 ## Load the Data into an Array
 
-```{r}
-im <- array(rep(0, length(files) * height/scale * width/scale * 3), dim=c(length(files), height/scale, width/scale, 3))
+```{r warning=F,message=F}
+# Based on the default values above
+# Creating an arry with dimensions[17, 60, 125, 3] with all zeroes to start
+img_arr <- array(rep(0, length(files) * height/scale * width/scale * colors), 
+            dim=c(length(files), height/scale, width/scale, colors))
 
-for (i in 1:num) {
-  temp <- resize(readJPEG(paste0("/Users/philiptanofsky/Documents/School/CUNY/MSDS/Courses/DATA605/Week04/jpg/", files[i])), height/scale, width/scale)
-  im[i,,,] <- array(temp, dim=c(1, height/scale, width/scale, 3))
+# Loop through the image paths
+for (i in 1:num_of_images) {
+  temp <- resize(readJPEG(paste0(img_dir, files[i])), 
+                 height/scale, 
+                 width/scale)
+  # Load the scaled images into the image array declared above
+  img_arr[i,,,] <- array(temp, dim=c(1, height/scale, width/scale, colors))
 }
 ```
 
 ## Vectorize
 
-```{r}
-flat <- matrix(0, num, prod(dim(im)))
+```{r warning=F,message=F}
+# Create matrix of image count rows (17) and image array dimensions as columns (382500)
+flat <- matrix(0, num_of_images, prod(dim(img_arr)))
 
-for (i in 1:num) {
-  newim <- readJPEG(paste0("/Users/philiptanofsky/Documents/School/CUNY/MSDS/Courses/DATA605/Week04/jpg/", files[i]))
-  r <- as.vector(im[i,,,1])
-  g <- as.vector(im[i,,,2])
-  b <- as.vector(im[i,,,3])
+# Loop through images
+for (i in 1:num_of_images) {
+  #newim <- readJPEG(paste0(img_dir, files[i])) # Extra line of code
+  # From image array, pull vector for color Red for given image
+  r <- as.vector(img_arr[i,,,1])
+  # From image array, pull vector for color Green for given image
+  g <- as.vector(img_arr[i,,,2])
+  # From image array, pull vector for color Blue for given image
+  b <- as.vector(img_arr[i,,,3])
+  # Take transpose of the color vectors to make it fit the row length of flat matrix
   flat[i,] <- t(c(r, g, b))
 }
+# Take transpose of the flat matrix
 shoes <- as.data.frame(t(flat))
+
+#dim(shoes)
+#382500     17
+# As expected, now >300k rows with 17 columns
 ```
 
 ## Actual Plots
 
-NOT SHOWING UP, PLEASE CHECK THIS CODE BELOW
-
-```{r}
-# Old Shoes
+```{r warning=F,message=F}
+# Plot the original images of the Shoes
 par(mfrow=c(3,3))
+# mai: set margin in inches
 par(mai=c(.3, .3, .3, .3))
-for (i in 1:num) { # plot the first images only
-  plot_jpeg(writeJPEG(im[i,,,]))
+# Loop through image array and call the plot_jpeg function
+for (i in 1:num_of_images) {
+  plot_jpeg(writeJPEG(img_arr[i,,,]))
 }
 ```
 
 ## Get Eigen components from correlation structure
 
-```{r}
+```{r warning=F,message=F}
 scaled <- scale(shoes, center=TRUE, scale=TRUE)
+#scaled object contains rows:382500     cols:17
+# Clever way to pull the mean of each column using the scale function
 mean.shoe <- attr(scaled, "scaled:center") # saving for classification
+# Clever way to pull the standard deviation of each column using the scale function
 std.shoe <- attr(scaled, "scaled:scale") # saving for classification ... later
 ```
 
 ## Calculate Covariance (Correlation)
 
-```{r}
+```{r warning=F,message=F}
+# Create correlation matrix based on the number of images, in this case 17x17
 sigma_ <- cor(scaled)
 
 #sigma_
@@ -108,52 +154,74 @@ sigma_ <- cor(scaled)
 
 ## Get the eigencomponents
 
-```{r}
+```{r warning=F,message=F}
+# Compute the eigenvalues and eigenvectors based on the correlation matrix
 myeigen <- eigen(sigma_)
 cumsum(myeigen$values) / sum(myeigen$values)
 ```
 
 ## Eigen shoes
 
-```{r}
-scaling <- diag(myeigen$values[1:5]^(-1/2)) / (sqrt(nrow(scaled)-1))
-eigenshoes <- scaled %*% myeigen$vectors[,1:5] %*% scaling
-imageShow(array(eigenshoes[,1], c(60, 125, 3)))
+```{r warning=F,message=F}
+# Why was 5 selected?
+scaling <- diag(myeigen$values[1:2]^(-1/2)) / (sqrt(nrow(scaled)-1))
+eigenshoes <- scaled %*% myeigen$vectors[,1:2] %*% scaling
+imageShow(array(eigenshoes[,1], c(height/scale, width/scale, colors)))
+```
+
+```{r warning=F,message=F,eval=F}
+# Dupe from above with different column count ... remove as needed
+scaling <- diag(myeigen$values[1:17]^(-1/2)) / (sqrt(nrow(scaled)-1))
+eigenshoes <- scaled %*% myeigen$vectors[,1:17] %*% scaling
+imageShow(array(eigenshoes[,1], c(height/scale, width/scale, colors)))
 ```
 
 ## Generate Principal Components
 
 Transform the images
 
-```{r}
+```{r warning=F,message=F}
 # Generate variables
 height <- 1200
 width <- 2500
 scale <- 20
-newdata <- im
-dim(newdata) <- c(length(files), height*width*3/scale^2)
+# Start with the image array of the original images
+newdata <- img_arr
+
+# Convert the dimensions of the array to n x m, instead of n x m x o x p
+dim(newdata) <- c(length(files), height*width*colors/scale^2)
+
+# Transpose the n x m array, and then calculate the principal components
 mypca <- princomp(t(as.matrix(newdata)), scores=TRUE, cor=TRUE)
+# contains 17 components
+
+
+#mypca
+
+#dim(mypca$scores)
+#22500    17
 ```
 
 ## Eigenshoes
 
 Generate Eigenshoes
 
-```{r}
+```{r warning=F,message=F}
 mypca2 <- t(mypca$scores)
-dim(mypca2) <- c(length(files), height/scale, width/scale, 3)
+# Reset the dimensions of the the PCA object to fit the initial array dimensions
+dim(mypca2) <- c(length(files), height/scale, width/scale, colors)
 par(mfrow=c(5,5))
 par(mai=c(.001, .001, .001, .001))
-# Plot the first 20 eigenshoes only
-for (i in 1:num) {
+# Plot the eigenshoes only
+for (i in 1:num_of_images) {
   plot_jpeg(writeJPEG(mypca2[i,,,], bg="white")) # Complete without reduction
 }
 ```
 
 ## Variance Capture
 
-```{r}
-a <- round(mypca$sdev[1:num]^2 / sum(mypca$sdev^2), 3)
+```{r warning=F,message=F}
+a <- round(mypca$sdev[1:num_of_images]^2 / sum(mypca$sdev^2), 3)
 cumsum(a)
 ```
 
