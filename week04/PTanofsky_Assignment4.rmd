@@ -1,25 +1,29 @@
 ---
-title: 'DATA 605: Assignment 04'
-subtitle: 'EigenShoes'
+title: 'DATA 605: Assignment 04 - Eigenshoes'
+subtitle: 'CUNY Spring 2021'
 author: "Philip Tanofsky"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output: pdf_document
 ---
 
-# EigenShoes
+# Introduction: Eigenshoes
 
-Starting point: https://rpubs.com/R-Minator/eigenshoes
+This project attempts to generate "eigenshoes", which means to perform matrix transformations on images of shoes using Principal Component Analysis (PCA) using eigenvalues and eigenvectors to display shoe-like images based on the calculated level of variance from the PCA. The project displays the initial JPEG image and then following the matrix transformations displays the eigen-calculated representations of the same images based accounting for at least 80% variability.
+
+Project based on: https://rpubs.com/R-Minator/eigenshoes
 
 ```{r warning=F,message=F}
-# Libraries
+# Required libraries
 library(jpeg)
 library(EBImage)
 library(OpenImageR)
 ```
 
-## Use of Graphics
+## Retrieve Input File Names
 
-Add graphics to the data set.
+First step, read in the JPEG image names from local directory. At the moment, the project contains 17 images. If the number of JPEG images is different, then change the value assigned to variable $num\_of\_images$.
+
+**Note:** I did not push the JPEG images to my Github account. In order to successfully run this file, copy the $jpg$ directory to the same directory as this file, or change the string literal of the variable $img\_dir$ below as needed.
 
 ```{r warning=F,message=F}
 # Prepare for Image Processing
@@ -28,7 +32,10 @@ Add graphics to the data set.
 num_of_images <- 17
 
 # Directory containing the images
-img_dir <- "/Users/philiptanofsky/Documents/School/CUNY/MSDS/Courses/DATA605/Week04/jpg/"
+# Initial approach pointed to full path of images
+#img_dir <- "/Users/philiptanofsky/Documents/School/CUNY/MSDS/Courses/DATA605/Week04/jpg/"
+# Edited to move the 'jpg' directory to the same directory as this file, so it's relative pathing
+img_dir <- "jpg/"
 
 # Read in the list of file names ending in ".jpg" from the directory
 # These are images provided by the professor
@@ -37,7 +44,13 @@ files <- list.files(img_dir, pattern="\\.jpg")[1:num_of_images]
 #files: Contains the list of jpg file names
 ```
 
-## View Shoes Function
+Variable $files$ contains the list of JPEG image file names.
+
+## Display JPEG Function
+
+The function $plot\_jpeg$ is a utility function to display a JPEG image for the purposes of this project.
+
+Also, global variables are set for image $height$, $width$, and $scale$, along with the number of colors $colors\_cnt$, which is set to three because the image is based on the RGB color definition.
 
 ```{r warning=F,message=F}
 # Set Adjustment Parameters (default values)
@@ -75,7 +88,9 @@ plot_jpeg <- function(path, add=FALSE) {
 }
 ```
 
-## Load the Data into an Array
+## Load Image Data
+
+Based on the list of $files$ initially retrieved, read in the actual JPEG images, and scale them based on the scale factors defined above.
 
 ```{r warning=F,message=F}
 # Based on the default values above
@@ -93,15 +108,18 @@ for (i in 1:num_of_images) {
 }
 ```
 
+Variable $img\_arr$ now contains the JPEG images with the pixels defined in a four-dimensional array.
+
 ## Vectorize
 
+Extract the RGB values from the image array containing the original shoe images. The $shoes$ dataframe now contains just the color values.
+
 ```{r warning=F,message=F}
-# Create matrix of image count rows (17) and image array dimensions as columns (382500)
+# Create matrix of image count, rows (17), and image array dimensions as columns (382500)
 flat <- matrix(0, num_of_images, prod(dim(img_arr)))
 
 # Loop through images
 for (i in 1:num_of_images) {
-  #newim <- readJPEG(paste0(img_dir, files[i])) # Extra line of code
   # From image array, pull vector for color Red for given image
   r <- as.vector(img_arr[i,,,1])
   # From image array, pull vector for color Green for given image
@@ -121,6 +139,8 @@ shoes <- as.data.frame(t(flat))
 
 ## Actual Plots
 
+Given the initial JPEG images, plot the images for visual inspection.
+
 ```{r warning=F,message=F}
 # Plot the original images of the Shoes
 par(mfrow=c(3,3))
@@ -133,7 +153,11 @@ for (i in 1:num_of_images) {
 }
 ```
 
+Confirmed ... yes, images of shoes do appear.
+
 ## Get Eigen components from correlation structure
+
+Start by scaling the $shoes$ dataframe to define the center and scale of the image.
 
 ```{r warning=F,message=F}
 scaled <- scale(shoes, center=TRUE, scale=TRUE)
@@ -146,6 +170,8 @@ scaled <- scale(shoes, center=TRUE, scale=TRUE)
 
 ## Calculate Covariance (Correlation)
 
+Based on the $scaled$ dataframe, apply the correlation matrix.
+
 ```{r warning=F,message=F}
 # Create correlation matrix based on the number of images, in this case 17x17
 sigma_ <- cor(scaled)
@@ -153,7 +179,9 @@ sigma_ <- cor(scaled)
 #sigma_
 ```
 
-## Get the eigencomponents
+## Get the eigen components
+
+From the correlation matrix, calculate the eigvenvalues and eigenvectors.
 
 ```{r warning=F,message=F}
 # Compute the eigenvalues and eigenvectors based on the correlation matrix
@@ -161,28 +189,37 @@ myeigen <- eigen(sigma_)
 cumsum(myeigen$values) / sum(myeigen$values)
 ```
 
-## Eigen shoes
+## Eigenshoes
+
+To achieve the "eigenshoes" visual, matrix transformations are required on the $scaled$ dataframe, containing the scaled color values.
 
 ```{r warning=F,message=F}
-# Why was 5 selected?
+# 3 components are selected ... see Conclusion for reasoning
 pca_comps <- 3
+
+# Create a matrix based on the first n eigen values
 scaling <- diag(myeigen$values[1:pca_comps]^(-1/2)) / (sqrt(nrow(scaled)-1))
+# Output matrix to confirm
 scaling
+# Output eigenvectors based on the first n eigen values
 myeigen$vectors[,1:pca_comps]
+# Apply the transformation on the scaled matrix which contains the color values.
 eigenshoes <- scaled %*% myeigen$vectors[,1:pca_comps] %*% scaling
-imageShow(array(eigenshoes[,1], c(height/scale, width/scale, colors_cnt)))
+#dim(eigenshoes)
+# 382500      3
+
+# Display the combined visual of the matrix transformation above
+for (i in 1:3) {
+  imageShow(array(eigenshoes[,i], c(height/scale, width/scale, colors_cnt)))
+}
+#imageShow(array(eigenshoes[,1], c(height/scale, width/scale, colors_cnt)))
 ```
 
-```{r warning=F,message=F,eval=F}
-# Dupe from above with different column count ... remove as needed
-scaling <- diag(myeigen$values[1:17]^(-1/2)) / (sqrt(nrow(scaled)-1))
-eigenshoes <- scaled %*% myeigen$vectors[,1:17] %*% scaling
-imageShow(array(eigenshoes[,1], c(height/scale, width/scale, colors_cnt)))
-```
+The above image displays the combined visual of the matrix transformations above. The $eigenshoes$ array contains three images, based on the three colors of RGB.
 
 ## Generate Principal Components
 
-Transform the images
+Calculate the principal components based on the initial $img\_arr$. The number of principal components will be equal to the number of images under consideration.
 
 ```{r warning=F,message=F}
 # Generate variables
@@ -201,7 +238,6 @@ dim(newdata) <- c(length(files), height*width*colors_cnt/scale^2)
 mypca <- princomp(t(as.matrix(newdata)), scores=TRUE, cor=TRUE)
 # contains 17 components
 
-
 #mypca
 
 #dim(mypca$scores)
@@ -210,7 +246,7 @@ mypca <- princomp(t(as.matrix(newdata)), scores=TRUE, cor=TRUE)
 
 ## Eigenshoes
 
-Generate Eigenshoes
+To finally generate the display of the "eigenshoes", the transpose of the PCA scores is required to get the matrix back in the form of row count equal to the number of initial images. Based on the transposed PCA scores, the images of "eigenshoes" are rendered as JPEGs.
 
 ```{r warning=F,message=F}
 # Transpose the Principal Component Analysis scores back to original matrix dimensions
@@ -220,7 +256,6 @@ dim(mypca2) <- c(length(files), height/scale, width/scale, colors_cnt)
 #par(mfrow=c(5,5))
 #par(mai=c(.001, .001, .001, .001))
 par(mfrow=c(3,3))
-# mai: set margin in inches
 par(mai=c(.3, .3, .3, .3))
 # Plot the eigenshoes only based on the PCA scores
 for (i in 1:num_of_images) {
@@ -230,37 +265,14 @@ for (i in 1:num_of_images) {
 
 ## Variance Capture
 
+Calculate the level of variability by principal component to determine the number of principal components required to achieve the goal of 80% variability.
+
 ```{r warning=F,message=F}
 num_comps <- 17
 a <- round(mypca$sdev[1:num_comps]^2 / sum(mypca$sdev^2), 3)
 cumsum(a)
 ```
 
-To account for 80% of the variability, the first 3 components are required to exceed the 80% threshold. As displayed above, the first component accounts for 69.3% and the first two combined accounts for 79.4% of the variability. Thus to reach at least 80% variability, the initial three components are required (84.5% variability accounted for).
+# Conclusion
 
-From: https://builtin.com/data-science/step-step-explanation-principal-component-analysis
-
-For PCA, standardization is valuable. Value - Mean / Standard Deviation, thus all variables will be on the same scale.
-
-then covariance matrix computation: because some variables are highly correlated in such a way that they contain redundant information
-covariance matrix is not more than a table that summaries the correlations between all the possible pairs of variables.
-
-Principal components are new variables that are constructed as linear combinations or mixtures of the initial variables. These combinations are done in such a way that the new variables (principal components) are uncorrelated and most of the information within the initial variables is squeezed or compressed into the first components.
-
-Percentage of explained variance decreases with the principal components starting with 1 and going to n
-
-The first principal component accounts for the largest possible variance in the data set.
-
-The eigenvectors of the Covariance matrix are actually the directions of the axes where there is the most variance (most information)
-
-
-
-
-
-
-
-
-
-
-
-
+To account for 80% of the variability, the first 3 components are required to exceed the 80% threshold. As displayed above, the first component accounts for 69.3% and the first two combined accounts for 79.4% of the variability. Thus to reach at least 80% variability, the initial three components are required (84.5% variability accounted for) for the "eigenshoes".
