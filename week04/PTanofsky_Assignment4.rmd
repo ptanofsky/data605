@@ -44,7 +44,7 @@ files <- list.files(img_dir, pattern="\\.jpg")[1:num_of_images]
 height <- 1200
 width <- 2500
 scale <- 20
-colors <- 3 # Constant represents R,G,B colors of the jpg images
+colors_cnt <- 3 # Constant represents R,G,B colors of the jpg images
 
 plot_jpeg <- function(path, add=FALSE) {
   # Read the file
@@ -80,8 +80,8 @@ plot_jpeg <- function(path, add=FALSE) {
 ```{r warning=F,message=F}
 # Based on the default values above
 # Creating an arry with dimensions[17, 60, 125, 3] with all zeroes to start
-img_arr <- array(rep(0, length(files) * height/scale * width/scale * colors), 
-            dim=c(length(files), height/scale, width/scale, colors))
+img_arr <- array(rep(0, length(files) * height/scale * width/scale * colors_cnt), 
+            dim=c(length(files), height/scale, width/scale, colors_cnt))
 
 # Loop through the image paths
 for (i in 1:num_of_images) {
@@ -89,7 +89,7 @@ for (i in 1:num_of_images) {
                  height/scale, 
                  width/scale)
   # Load the scaled images into the image array declared above
-  img_arr[i,,,] <- array(temp, dim=c(1, height/scale, width/scale, colors))
+  img_arr[i,,,] <- array(temp, dim=c(1, height/scale, width/scale, colors_cnt))
 }
 ```
 
@@ -127,6 +127,7 @@ par(mfrow=c(3,3))
 # mai: set margin in inches
 par(mai=c(.3, .3, .3, .3))
 # Loop through image array and call the plot_jpeg function
+# The image array contains the initial read in of the jpg files
 for (i in 1:num_of_images) {
   plot_jpeg(writeJPEG(img_arr[i,,,]))
 }
@@ -138,9 +139,9 @@ for (i in 1:num_of_images) {
 scaled <- scale(shoes, center=TRUE, scale=TRUE)
 #scaled object contains rows:382500     cols:17
 # Clever way to pull the mean of each column using the scale function
-mean.shoe <- attr(scaled, "scaled:center") # saving for classification
+#mean.shoe <- attr(scaled, "scaled:center") # saving for classification
 # Clever way to pull the standard deviation of each column using the scale function
-std.shoe <- attr(scaled, "scaled:scale") # saving for classification ... later
+#std.shoe <- attr(scaled, "scaled:scale") # saving for classification
 ```
 
 ## Calculate Covariance (Correlation)
@@ -164,16 +165,19 @@ cumsum(myeigen$values) / sum(myeigen$values)
 
 ```{r warning=F,message=F}
 # Why was 5 selected?
-scaling <- diag(myeigen$values[1:2]^(-1/2)) / (sqrt(nrow(scaled)-1))
-eigenshoes <- scaled %*% myeigen$vectors[,1:2] %*% scaling
-imageShow(array(eigenshoes[,1], c(height/scale, width/scale, colors)))
+pca_comps <- 3
+scaling <- diag(myeigen$values[1:pca_comps]^(-1/2)) / (sqrt(nrow(scaled)-1))
+scaling
+myeigen$vectors[,1:pca_comps]
+eigenshoes <- scaled %*% myeigen$vectors[,1:pca_comps] %*% scaling
+imageShow(array(eigenshoes[,1], c(height/scale, width/scale, colors_cnt)))
 ```
 
 ```{r warning=F,message=F,eval=F}
 # Dupe from above with different column count ... remove as needed
 scaling <- diag(myeigen$values[1:17]^(-1/2)) / (sqrt(nrow(scaled)-1))
 eigenshoes <- scaled %*% myeigen$vectors[,1:17] %*% scaling
-imageShow(array(eigenshoes[,1], c(height/scale, width/scale, colors)))
+imageShow(array(eigenshoes[,1], c(height/scale, width/scale, colors_cnt)))
 ```
 
 ## Generate Principal Components
@@ -189,9 +193,11 @@ scale <- 20
 newdata <- img_arr
 
 # Convert the dimensions of the array to n x m, instead of n x m x o x p
-dim(newdata) <- c(length(files), height*width*colors/scale^2)
+dim(newdata) <- c(length(files), height*width*colors_cnt/scale^2)
+
 
 # Transpose the n x m array, and then calculate the principal components
+# By transposing the array, now there are only 17 columns, and thus will produce 17 principal components
 mypca <- princomp(t(as.matrix(newdata)), scores=TRUE, cor=TRUE)
 # contains 17 components
 
@@ -207,12 +213,16 @@ mypca <- princomp(t(as.matrix(newdata)), scores=TRUE, cor=TRUE)
 Generate Eigenshoes
 
 ```{r warning=F,message=F}
+# Transpose the Principal Component Analysis scores back to original matrix dimensions
 mypca2 <- t(mypca$scores)
 # Reset the dimensions of the the PCA object to fit the initial array dimensions
-dim(mypca2) <- c(length(files), height/scale, width/scale, colors)
-par(mfrow=c(5,5))
-par(mai=c(.001, .001, .001, .001))
-# Plot the eigenshoes only
+dim(mypca2) <- c(length(files), height/scale, width/scale, colors_cnt)
+#par(mfrow=c(5,5))
+#par(mai=c(.001, .001, .001, .001))
+par(mfrow=c(3,3))
+# mai: set margin in inches
+par(mai=c(.3, .3, .3, .3))
+# Plot the eigenshoes only based on the PCA scores
 for (i in 1:num_of_images) {
   plot_jpeg(writeJPEG(mypca2[i,,,], bg="white")) # Complete without reduction
 }
@@ -221,9 +231,34 @@ for (i in 1:num_of_images) {
 ## Variance Capture
 
 ```{r warning=F,message=F}
-a <- round(mypca$sdev[1:num_of_images]^2 / sum(mypca$sdev^2), 3)
+num_comps <- 17
+a <- round(mypca$sdev[1:num_comps]^2 / sum(mypca$sdev^2), 3)
 cumsum(a)
 ```
+
+To account for 80% of the variability, the first 3 components are required to exceed the 80% threshold. As displayed above, the first component accounts for 69.3% and the first two combined accounts for 79.4% of the variability. Thus to reach at least 80% variability, the initial three components are required (84.5% variability accounted for).
+
+From: https://builtin.com/data-science/step-step-explanation-principal-component-analysis
+
+For PCA, standardization is valuable. Value - Mean / Standard Deviation, thus all variables will be on the same scale.
+
+then covariance matrix computation: because some variables are highly correlated in such a way that they contain redundant information
+covariance matrix is not more than a table that summaries the correlations between all the possible pairs of variables.
+
+Principal components are new variables that are constructed as linear combinations or mixtures of the initial variables. These combinations are done in such a way that the new variables (principal components) are uncorrelated and most of the information within the initial variables is squeezed or compressed into the first components.
+
+Percentage of explained variance decreases with the principal components starting with 1 and going to n
+
+The first principal component accounts for the largest possible variance in the data set.
+
+The eigenvectors of the Covariance matrix are actually the directions of the axes where there is the most variance (most information)
+
+
+
+
+
+
+
 
 
 
