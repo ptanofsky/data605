@@ -1,0 +1,234 @@
+---
+title: 'DATA 605: Assignment 5'
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: pdf_document
+---
+
+# Problem 1
+
+(Bayesian). A new test for multinucleoside-resistant (MNR) human immunodeficiency virus type 1 (HIV-1) variants was recently developed. The test maintains 96% sensitivity, meaning that, for those with the disease, it will correctly report "positive" for 96% of them. The test is also 98% specific, meaning that, for those without the disease, 98% will be correctly reported as "negative." MNR HIV-1 is considered to be rare (albeit emerging), with about a .1% or .001 prevalence rate. Given the prevalence rate, sensitivity, and specificity estimates, what is the probability that an individual who is reported as positive by the new test actually has the disease? If the median cost (consider this the best point estimate) is about \$100,000 per positive case total and the test itself costs \$1000 per administration, what is the total first-year cost for treating 100,000 individuals?
+
+### Solution
+
+Build a table based on the prevalence rate, sensitivity, and specificity estimates.
+
+$$
+\begin{tabular}{l|r|r|r}
+\hline
+  & Prev. Rate & Test Pos. & Test Neg.\\
+\hline
+Have Disease & 1 & .96 & .04\\
+\hline
+Don't Have Diseae & 999 & 19.98 & 979.02 \\
+\hline
+Total & 1000 & 20.94 & 979.06\\
+\hline
+\end{tabular}
+$$
+The above table indicates the probability that an individual who is reported as positive by the new test actually has the disease is ~4.5% (.96 / 20.94).
+
+For the scenario of testing 100,000 individuals, and given the above estimates, the total first-year cost would be \$309,400,000. First, the 100,000 tests would cost \$100,000,000, and given the expected number of positive test cases to be 2094 from the 100,000 individuals, the total for care for positive test cases is \$209,400,000, thus the overall total of **\$309,4000,000**.
+
+# Problem 2
+
+(Binomial). The probability of your organization receiving a Joint Commission inspection in any given month is .05. What is the probability that, after 24 months, you received exactly 2 inspections? What is the probability that, after 24 months, you received 2 or more inspections? What is the probability that your received fewer than 2 inspections? What is the expected number of inspections you should have received? What is the standard deviation?
+
+### Solution
+
+$$
+(Px) = {n \choose x} \times p^2 \times (1-p)^{n-x}
+$$
+X = 2, p = .05, n = 24
+
+$$
+(Px=2) = {24 \choose 2} \times .05^2 \times (.95)^{22}
+$$
+
+```{r}
+two_insp <- choose(24, 2) * .05^2 * .95^22
+```
+
+Exactly two inspections `r two_insp`.
+
+```{r}
+# For exactly 2
+dbinom(2, size=24, prob=0.05) 
+```
+
+Confirming above with an R function
+
+```{r}
+less_than_two <- pbinom(1, size=24, prob=0.05) 
+two_or_more <- 1 - less_than_two
+```
+
+Two or more inspections `r two_or_more` and less than two inspections `r less_than_two`.
+
+```{r}
+n <- 24
+prob <- .05
+x <- 0:24
+p <- dbinom(x,n,prob)
+(p * 100)
+```
+
+The result with the highest probability (or likelihood) is 1.
+
+```{r}
+# Compute mean
+mu <- sum(x*p)
+# Compute variance
+sigma.sq=sum(x^2*p)-mu^2
+# Compute standarad deviation
+sigma=sqrt(sigma.sq)
+```
+
+Mean (or expected value) is `r mu`.
+
+Variance is `r sigma.sq`.
+
+Standard deviation is `r sigma`.
+
+# Problem 3
+
+(Poisson). You are modeling the family practice clinic and notice that patients arrive at a rate of 10 per hour. What is the probability that exactly 3 arrive in one hour? What is the probability that more than 10 arrive in one hour? How many would you expect to arrive in 8 hours? What is the standard deviation of the appropriate probability distribution? If there are three family practice providers that can see 24 templated patients each day, what is the percent utilization and what are your recommendations?
+
+### Solution
+
+$$
+(Px:\mu) = \frac{e^{-\mu} \times \mu^x}{{x!}} where\ \mu\ is\ the\ mean
+$$
+
+#### Exactly 3
+
+$$
+(P_{3:10}) = \frac{e^{-10} \times 10^3}{{3!}}
+$$
+```{r}
+prob_3 <- exp(-10) * (10^3) / 6
+```
+
+Probability of 3 in one hour: `r prob_3` (or `r prob_3 * 100`%).
+
+```{r}
+prob_3_v2 <- ppois(3, lambda=10) - ppois(2, lambda=10)
+```
+
+Confirming result using $ppois$ function. Result is `r prob_3_v2`.
+
+#### More than 10
+```{r}
+prob_more_10 <- ppois(10, lambda=10, lower=FALSE)
+```
+
+Probability of more than 10 in one hour: `r prob_more_10` (or `r prob_more_10 * 100`%).
+
+#### Expect in 8 hours
+
+Answer: 80 (8 hours multiplied by rate of 10 per hour)
+
+#### Standard Deviation
+
+Standard deviation of 10 per hour rate is: `r sqrt(10)`.
+
+Standard deviation of 80 over 8 hours: `r sqrt(80)`.
+
+##### Percent Utilization
+
+Given three family practioners can see 24 patients each day, that's a total of 72 patients in a given day. If the expected total in an 8-hour day is 80, then percent utilization is 100%. Considering the overage of 8, 80 / 72, the calculated value is 111% percent utilization if the additional patients are seen.
+
+Recommendation: Considering each practioner can only see 24 patients per day, and a given day is expecting 80 patients, then I considered what are the probabilities of the patient count per day with the given rate of 80 patients per day.
+
+```{r}
+pprob_72 <- ppois(72, lambda=80)
+
+pprob_80 <- ppois(80, lambda=80)
+
+pprob_92 <- ppois(92, lambda=80)
+
+pprob_96 <- ppois(96, lambda=80)
+
+pprob_100 <- ppois(100, lambda=80)
+```
+
+Probability of 72 patients or fewer is `r pprob_72` (or `r pprob_72 * 100`%), which means ~20% of the days, no patient is turned away.
+
+Probability of 80 patients or fewer is `r pprob_80` (or `r pprob_80 * 100`%), which means ~53% of the days, no patient is turned away.
+
+Probability of 92 patients or fewer is `r pprob_92` (or `r pprob_92 * 100`%), which means ~92% of the days, no patient is turned away.
+
+Probability of 96 patients or fewer is `r pprob_96` (or `r pprob_96 * 100`%), which means ~96% of the days, no patient is turned away.
+
+Probability of 100 patients or fewer is `r pprob_100` (or `r pprob_100 * 100`%), which means ~99% of the days, no patient is turned away.
+
+Given the above calculations, I would suggest the practice schedule enough family practitioners to account for 96 patients, which would mean hiring a fourth family practioner. This would indicate that on ~96% of the days, all patients will be seen. And given 96 is a multiple of 24, I'd say it fits. This obviously doesn't take into account the cost of a family practioner (full-time or part-time), nor the option of a family practioner splitting time between two clinics. But given the expectation (or hope) that the clinic does not want to turn patients away, then I'd recommend 4 full-time family practioners to ensure there's only 13 days of the year in which patients are turned away.
+
+# Problem 4
+
+(Hypergeometric). Your subordinate with 30 supervisors was recently accused of favoring nurses. 15 of the subordinate’s workers are nurses and 15 are other than nurses. As evidence of malfeasance, the accuser stated that there were 6 company-paid trips to Disney World for which everyone was eligible. The supervisor sent 5 nurses and 1 non-nurse. If your subordinate acted innocently, what was the probability he/she would have selected five nurses for the trips? How many nurses would we have expected your subordinate to send? How many non-nurses would we have expected your subordinate to send?
+
+### Solution
+
+$$
+P(X=k) = \frac{{K \choose k} \times {N-K \choose n-k}}{N \choose n}
+
+$$
+
+Where: 
+
+- K is the number of successes in the population
+
+- k is the number of observed successes
+
+- N is the population size
+
+- n is the number of draws
+
+#### Probability of 5 nurses
+
+```{r}
+K <- 15
+k <- 5
+N <- 30
+n <- 6
+
+result <- choose(K, k) * choose(N-K, n-k) / choose(N,n)
+result
+```
+
+Probability of 5 nurses selected is: `r result` (or `r result * 100`).
+
+# Problem 5
+
+(Geometric). The probability of being seriously injured in a car crash in an unspecified location is about .1% per hour. A driver is required to traverse this area for 1200 hours in the course of a year. What is the probability that the driver will be seriously injured during the course of the year? In the course of 15 months? What is the expected number of hours that a driver will drive before being seriously injured? Given that a driver has driven 1200 hours, what is the probability that he or she will be injured in the next 100 hours?
+
+### Solution
+
+XXX
+
+# Problem 6
+
+You are working in a hospital that is running off of a primary generator which fails about once in 1000 hours. What is the probability that the generator will fail more than twice in 1000 hours? What is the expected value?
+
+### Solution
+
+XXX
+
+# Problem 7
+
+A surgical patient arrives for surgery precisely at a given time. Based on previous analysis (or a lack of knowledge assumption), you know that the waiting time is uniformly distributed from 0 to 30 minutes. What is the probability that this patient will wait more than 10 minutes? If the patient has already waited 10 minutes, what is the probability that he/she will wait at least another 5 minutes prior to being seen? What is the expected waiting time?
+
+### Solution
+
+XXX
+
+# Problem 8
+
+Your hospital owns an old MRI, which has a manufacturer’s lifetime of about 10 years (expected value). Based on previous studies, we know that the failure of most MRIs obeys an exponential distribution. What is the expected failure time? What is the standard deviation? What is the probability that your MRI will fail after 8 years? Now assume that you have owned the machine for 8 years. Given that you already owned the machine 8 years, what is the probability that it will fail in the next two years?
+
+
+### Solution
+
+XXX
