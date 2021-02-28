@@ -29,7 +29,7 @@ Total & 1000 & 20.94 & 979.06\\
 $$
 The above table indicates the probability that an individual who is reported as positive by the new test actually has the disease is ~4.5% (.96 / 20.94).
 
-For the scenario of testing 100,000 individuals, and given the above estimates, the total first-year cost would be \$309,400,000. First, the 100,000 tests would cost \$100,000,000, and given the expected number of positive test cases to be 2094 from the 100,000 individuals, the total for care for positive test cases is \$209,400,000, thus the overall total of **\$309,4000,000**.
+For the scenario of testing 100,000 individuals, and given the above estimates, the total first-year cost would be \$309,400,000. First, the 100,000 tests would cost \$100,000,000, and given the expected number of positive test cases to be 2094 from the 100,000 individuals, the total for care for positive test cases is \$209,400,000, thus the overall total of **\$309,400,000**.
 
 # Problem 2
 
@@ -50,7 +50,7 @@ $$
 two_insp <- choose(24, 2) * .05^2 * .95^22
 ```
 
-Exactly two inspections `r two_insp`.
+Exactly two inspections `r two_insp` (or `r two_insp * 100`%).
 
 ```{r}
 # For exactly 2
@@ -64,7 +64,7 @@ less_than_two <- pbinom(1, size=24, prob=0.05)
 two_or_more <- 1 - less_than_two
 ```
 
-Two or more inspections `r two_or_more` and less than two inspections `r less_than_two`.
+Two or more inspections `r two_or_more` (or `r two_or_more * 100`%) and less than two inspections `r less_than_two` (or `r less_than_two * 100`%).
 
 ```{r}
 n <- 24
@@ -131,9 +131,9 @@ Answer: 80 (8 hours multiplied by rate of 10 per hour)
 
 #### Standard Deviation
 
-Standard deviation of 10 per hour rate is: `r sqrt(10)`.
+Standard deviation of 10 per hour rate is: `r sqrt(10)`. Square root of 10.
 
-Standard deviation of 80 over 8 hours: `r sqrt(80)`.
+Standard deviation of 80 over 8 hours: `r sqrt(80)`. Square root of 80.
 
 ##### Percent Utilization
 
@@ -199,7 +199,7 @@ result <- choose(K, k) * choose(N-K, n-k) / choose(N,n)
 result
 ```
 
-Probability of 5 nurses selected is: `r result` (or `r result * 100`).
+Probability of 5 nurses selected is: `r result` (or `r result * 100`%).
 
 #### Expected count of nurses
 
@@ -268,7 +268,7 @@ You are working in a hospital that is running off of a primary generator which f
 more_than_two <- 1 - pbinom(2, size=1000, prob=0.001) 
 ```
 
-Probability the generator will fail more than twice in 1000 hours: `r more_than_two` or (`more_than_two * 100`%).
+Probability the generator will fail more than twice in 1000 hours: `r more_than_two` or (`r more_than_two * 100`%).
 
 #### Expected value
 
@@ -277,7 +277,7 @@ n <- 1000
 prob <- .001
 
 # Compute mean
-mu <- x*prob
+mu <- n*prob
 ```
 
 The mean, or expected value, for the given scenario is: `r mu`.
