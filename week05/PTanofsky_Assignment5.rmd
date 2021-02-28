@@ -137,9 +137,9 @@ Standard deviation of 80 over 8 hours: `r sqrt(80)`.
 
 ##### Percent Utilization
 
-Given three family practioners can see 24 patients each day, that's a total of 72 patients in a given day. If the expected total in an 8-hour day is 80, then percent utilization is 100%. Considering the overage of 8, 80 / 72, the calculated value is 111% percent utilization if the additional patients are seen.
+Given three family practitioners can see 24 patients each day, that's a total of 72 patients in a given day. If the expected total in an 8-hour day is 80, then percent utilization is 100%. Considering the overage of 8, 80 / 72, the calculated value is 111% percent utilization if the additional patients are seen.
 
-Recommendation: Considering each practioner can only see 24 patients per day, and a given day is expecting 80 patients, then I considered what are the probabilities of the patient count per day with the given rate of 80 patients per day.
+Recommendation: Considering each practitioner can only see 24 patients per day, and a given day is expecting 80 patients, then I considered what are the probabilities of the patient count per day with the given rate of 80 patients per day.
 
 ```{r}
 pprob_72 <- ppois(72, lambda=80)
@@ -163,17 +163,18 @@ Probability of 96 patients or fewer is `r pprob_96` (or `r pprob_96 * 100`%), wh
 
 Probability of 100 patients or fewer is `r pprob_100` (or `r pprob_100 * 100`%), which means ~99% of the days, no patient is turned away.
 
-Given the above calculations, I would suggest the practice schedule enough family practitioners to account for 96 patients, which would mean hiring a fourth family practioner. This would indicate that on ~96% of the days, all patients will be seen. And given 96 is a multiple of 24, I'd say it fits. This obviously doesn't take into account the cost of a family practioner (full-time or part-time), nor the option of a family practioner splitting time between two clinics. But given the expectation (or hope) that the clinic does not want to turn patients away, then I'd recommend 4 full-time family practioners to ensure there's only 13 days of the year in which patients are turned away.
+Given the above calculations, I would suggest the practice schedule enough family practitioners to account for 96 patients, which would mean hiring a fourth family practitioner. This would indicate that on ~96% of the days, all patients will be seen. And given 96 is a multiple of 24, I'd say it fits. This obviously doesn't take into account the cost of a family practitioner (full-time or part-time), nor the option of a family practitioner splitting time between two clinics. But given the expectation (or hope) that the clinic does not want to turn patients away, then I'd recommend 4 full-time family practitioners to ensure there's only 13 days of the year in which patients are turned away.
 
 # Problem 4
 
 (Hypergeometric). Your subordinate with 30 supervisors was recently accused of favoring nurses. 15 of the subordinate’s workers are nurses and 15 are other than nurses. As evidence of malfeasance, the accuser stated that there were 6 company-paid trips to Disney World for which everyone was eligible. The supervisor sent 5 nurses and 1 non-nurse. If your subordinate acted innocently, what was the probability he/she would have selected five nurses for the trips? How many nurses would we have expected your subordinate to send? How many non-nurses would we have expected your subordinate to send?
 
+
+
 ### Solution
 
 $$
-P(X=k) = \frac{{K \choose k} \times {N-K \choose n-k}}{N \choose n}
-
+P(X=k) = \frac{{K \choose k} \times {N-K \choose n-k}}{{N \choose n}}
 $$
 
 Where: 
@@ -200,13 +201,60 @@ result
 
 Probability of 5 nurses selected is: `r result` (or `r result * 100`).
 
+#### Expected count of nurses
+
+```{r}
+# Specify x-values for dhyper function 
+x_dhyper <- seq(0, 6, by = 1) 
+
+# Apply dhyper function 
+y_dhyper <- dhyper(x_dhyper, m = 15, n = 15, k = 6) 
+y_dhyper
+```
+
+Using the $dhyper$ function, the most likely outcome is 3 nurses with a probability of 34.8659%. And given that 3 nurses is the most likely outcome, then 3 non-nurses is the expected result for non-nurses. Given the symmetry of the question, 30 individuals of that 15 nurses, and 15 non-nurses, the expected result is 3 of each.
+
 # Problem 5
 
 (Geometric). The probability of being seriously injured in a car crash in an unspecified location is about .1% per hour. A driver is required to traverse this area for 1200 hours in the course of a year. What is the probability that the driver will be seriously injured during the course of the year? In the course of 15 months? What is the expected number of hours that a driver will drive before being seriously injured? Given that a driver has driven 1200 hours, what is the probability that he or she will be injured in the next 100 hours?
 
 ### Solution
 
-XXX
+Given the initial percentage of .1% crashes per hour, that is the equivalent of 1 in 1000. So now, considering the one year containing 1200 hours, the calculation is 1 minus the probability of no car crash, so .999 times 1200.
+
+```{r}
+result_1200 <- 1 - .999^1200
+```
+
+Probability that the driver is seriously injured in 1200 hours: `r result_1200` or (`r result_1200 * 100`%).
+
+Similar to above, find the probability of no car crash in 1500 hours and subtract that from 1.
+
+```{r}
+result_1500 <- 1 - .999^1500
+```
+
+Probability that the driver is seriously injured in 1500 hours: `r result_1500` or (`r result_1500 * 100`%).
+
+#### Hours driven before serious injury
+
+Finding the expected value or the mean is
+
+$$
+\mu = E(x) = \frac{1}{p} = \frac{1}{.001} = 1000\ hours
+$$
+
+#### Injured in the next 100 hours
+
+Given that that geometric distribution has the memoryless property, it does not matter the driver has already driven 1200, the probability that he or she will be injured in the next 100 hours is simply computing for an accident in 100 hours.
+
+Just as above, solve for a crash not occurring in 100 hours, and then subtract from 1.
+
+```{r}
+result_100 <- 1 - .999^100
+```
+
+Probability that the driver is seriously injured in next 100 hours: `r result_100` or (`r result_100 * 100`%).
 
 # Problem 6
 
@@ -214,7 +262,25 @@ You are working in a hospital that is running off of a primary generator which f
 
 ### Solution
 
-XXX
+#### Failure more than twice
+
+```{r}
+more_than_two <- 1 - pbinom(2, size=1000, prob=0.001) 
+```
+
+Probability the generator will fail more than twice in 1000 hours: `r more_than_two` or (`more_than_two * 100`%).
+
+#### Expected value
+
+```{r}
+n <- 1000
+prob <- .001
+
+# Compute mean
+mu <- x*prob
+```
+
+The mean, or expected value, for the given scenario is: `r mu`.
 
 # Problem 7
 
@@ -222,7 +288,37 @@ A surgical patient arrives for surgery precisely at a given time. Based on previ
 
 ### Solution
 
-XXX
+Given the wait times are 0 to 30 minutes, this indicates there are 31 possible outcomes which are uniformly distributed.
+
+##### Probability that this patient will wait more than 10 minutes
+
+More than 10 minutes indicates 20 possible outcomes of the 31.
+
+```{r}
+result <- 20 / 31 
+```
+
+Probability patient will wait more than 10 minutes: `r result` (or `r result * 100`%).
+
+#### Probability of at least 5 more minutes
+
+Given 10 minutes have elapsed, then 20 possible outcomes remain, so waiting 5 or more minutes would be 16 of those 20 outcomes.
+
+```{r}
+result <- 16 / 20 
+```
+
+Probability patient will wait at least 5 more minutes: `r result` (or `r result * 100`%).
+
+#### Expected wait time
+
+For uniform distribution, this would be the mean of the two boundaries, 0 and 30.
+
+```{r}
+result <- (0 + 30) / 2 
+```
+
+The expected wait time: `r result` minutes.
 
 # Problem 8
 
@@ -231,4 +327,43 @@ Your hospital owns an old MRI, which has a manufacturer’s lifetime of about 10
 
 ### Solution
 
-XXX
+#### Expected Failure Time
+
+When $\mu$ is the historical average wait time, in this case 10 years, that means $m$ the decay parameter is 1/10 then the mean for expected failure time is 10 years.
+
+#### Standard Deviation
+
+The standard deviation is the same as the mean for exponential distribution, so standard deviation is also 10.
+
+#### Fail after 8 years
+
+$$
+P(x>8) = 1 - P(x < 8)
+$$
+
+$$
+Since\ P(X<x) = 1-e^{-mx},\ then\ P(X>x) = 1 - (1-e^{-mx}) = e^{-mx}
+$$
+
+$$
+P(x>8) = e^{(-.1)(8)}
+$$
+
+```{r}
+result <- exp(-.1 * 8)
+```
+
+Probability that your MRI will fail after 8 years: `r result` or (`r result * 100`%).
+
+#### Fail in the next two years
+
+As, exponential distribution has the memoryless property, failure in the next two years is just failure in the next two years. So taking the examples above as a template:
+
+$$
+P(x<2) = 1-e^{(-.1)(2)}
+$$
+```{r}
+result <- 1 - exp(-.1 * 2)
+```
+
+Probability that your MRI will fail in the next 2 years: `r result` or (`r result * 100`%).
