@@ -1,0 +1,217 @@
+---
+title: 'DATA 605: Assignment 6'
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: pdf_document
+---
+
+# Problem 1
+A bag contains 6 green and 9 red jellybeans. How many ways can 5 jellybeans be withdrawn from the bag so that the number of green ones withdrawn will be less than 4?
+
+### Answer:
+${6 \choose 0} * {9 \choose 5} + {6 \choose 1} * {9 \choose 4} + {6 \choose 2} * {9 \choose 3} + {6 \choose 3} * {9 \choose 2} = 2862$
+
+```{r}
+# Calculate Green <= 3
+a_1 <- choose(6, 0) * choose(9,5) + 
+       choose(6, 1) * choose(9,4) + 
+       choose(6, 2) * choose(9,3) + 
+       choose(6, 3) * choose(9,2)
+
+# Calculate total
+tot <- choose(15, 5)
+
+# Calculate Green >= 4
+rem <- choose(6, 4) * choose(9,1) + 
+       choose(6, 5) * choose(9,0)
+
+a_1
+tot
+rem
+(tot-rem)
+```
+
+# Problem 2
+A certain congressional committee consists of 14 senators and 13 representatives. How many ways can a subcommittee of 7 be formed if at least 4 of the members must be senators?
+
+### Answer:
+
+${14 \choose 4} * {13 \choose 3} + {14 \choose 5} * {13 \choose 2}  + {14 \choose 6} * {13 \choose 1} + {14 \choose 7} * {13 \choose 0}= 484913$
+
+```{r}
+# Calculate Senators >= 4
+a_2 <- choose(14, 4) * choose(13,3) + 
+       choose(14, 5) * choose(13,2) + 
+       choose(14, 6) * choose(13,1) + 
+       choose(14, 7) * choose(13,0)
+
+# Calculate total
+tot <- choose(27, 7)
+
+# Calculate Senators < 4
+rem <- choose(14, 3) * choose(13,4) + 
+       choose(14, 2) * choose(13,5) + 
+       choose(14, 1) * choose(13,6) + 
+       choose(14, 0) * choose(13,7)
+
+a_2
+tot
+rem
+(tot-rem)
+```
+
+# Problem 3
+If a coin is tossed 2 times, and then a standard six-sided die is rolled 4 times, and finally a group of three cards are drawn from a standard deck of 52 cards without replacement, how many different outcomes are possible?
+
+### Answer:
+
+Assuming order of cards doesn't matter based on prompt:
+
+$2^2 * 6^4 * {52 \choose 3} = 114566400$
+
+```{r}
+a_3 <- 2^2 * 6^4 * choose(52, 3)
+a_3
+```
+
+
+# Problem 4
+3 cards are drawn from a standard deck without replacement. What is the probability that at least one of the cards drawn is a heart? Express your answer as a fraction or a decimal number rounded to four decimal places.
+
+### Answer:
+
+Probability of no hearts:
+$39/52 * 38/51 * 37/50 = 0.4135294$
+
+Probability of at least one heart:
+$1 - 0.4135294 = 0.5864706\ \dots\ 0.5865$
+
+# Problem 5
+Leanne is picking out some movies to rent, and she is primarily interested in children's movies and comedies. She has narrowed down her selections to 18 children's movies and 7 comedies.
+
+## Step 1
+How many different combinations of 3 movies can she rent?
+
+### Answer:
+
+${25 \choose 3} = 2300$
+```{r}
+a_5.1 <- choose(25, 3)
+a_5.1
+```
+
+## Step 2
+How many different combinations of 3 movies can she rent if she wants at least one comedy?
+
+### Answer:
+${7 \choose 1} * {18 \choose 2} + {7 \choose 2} * {18 \choose 1}  + {7 \choose 3} * {18 \choose 0} = 1484$
+
+```{r}
+# Calculate Comedy >= 1
+a_5.2 <- choose(7, 1) * choose(18,2) + 
+         choose(7, 2) * choose(18,1) + 
+         choose(7, 3) * choose(18,0) 
+
+# Calculate total
+# already have a_5.1
+
+# Calculate Comedy = 0
+rem <- choose(7, 0) * choose(18,3)
+
+a_5.2
+rem
+(a_5.1-rem)
+```
+
+
+# Problem 6
+DJ Jacqueline is making a playlist for an internet radio show; she is trying to decide what 6 songs to play and in what order they should be played. If she has her choices narrowed down to 7 hip-hop, 14 pop, and 22 blues songs, and she wants to play an equal number of hip-hop, pop, and blues songs, how many different playlists are possible? Express your answer in scientific notation rounding to the hundredths place.
+
+## Answer:
+${{}^{7}\!P_{2}} * {{}^{14}\!P_{2}} * {{}^{22}\!P_{2}} = 3.53 \times 10^6$
+
+```{r}
+perm = function(n, x) {
+  factorial(n) / factorial(n-x)
+}
+
+a_6 <- perm(7,2) * perm(14,2) * perm(22,2)
+a_6
+```
+
+# Problem 7
+DJ Howard is making a playlist for a friend; he is trying to decide what 9 songs to play and in what order they should be played.
+
+## Step 1
+If he has his choices narrowed down to 7 pop, 3 hip-hop, 6 country, and 7 blues songs, and he wants to play no more than 3 country songs, how many different playlists are possible? Express your answer in scientific notation rounding to the hundredths place.
+
+### Answer:
+$({{}^{6}\!P_{3}} * {{}^{17}\!P_{6}}) + ({{}^{6}\!P_{2}} * {{}^{17}\!P_{7}}) + ({{}^{6}\!P_{1}} * {{}^{17}\!P_{8}}) + ({{}^{6}\!P_{0}} * {{}^{17}\!P_{9}}) = 1.87 \times 10^{10}$
+
+```{r}
+# Country <= 3, total 9
+a_7.1 <- perm(6,3) * perm(17,6) + 
+         perm(6,2) * perm(17,7) + 
+         perm(6,1) * perm(17,8) + 
+         perm(6,0) * perm(17,9)
+a_7.1
+```
+
+## Step 2
+If he has his choices narrowed down to 7 pop, 3 hip-hop, 6 country, and 7 blues songs, and he wants to play all 7 blues songs, how many different playlists are possible? Express your answer in scientific notation rounding to the hundredths place.
+
+### Answer:
+$({{}^{7}\!P_{7}} * {{}^{16}\!P_{2}}) = 1.21 \times 10^{6}$
+
+```{r}
+# Blues = 7, total 9
+a_7.2 <- perm(7,7) * perm(16,2)
+a_7.2
+```
+
+# Problem 8
+Mallory is planting trees along her driveway, and she has 3 beech trees and 3 eucalyptus trees to plant in one row. What is the probability that she randomly plants the trees so that all 3 beech trees are next to each other and all 3 eucalyptus trees are next to each other? Express your answer as a fraction or a decimal number rounded to four decimal places.
+
+### Answer:
+
+Permutations of 6 entities
+
+${{}^{6}\!P_{6}} = 720$
+
+Only 2 outcomes match the criteria: BBBEEE or EEEBBB
+
+$\frac{2}{720} = \frac{1}{360} = 0.0028$
+
+# Problem 9
+If you draw a queen or lower from a standard deck of cards, I will pay you $4. If not, you
+pay me $14. (Aces are considered the highest card in the deck.)
+
+### Step 1
+Find the expected value of the proposition. Round your answer to two decimal
+places. Losses must be expressed as negative values.
+
+### Answer:
+P(W) is probability of win
+
+A(W) is value of win
+
+$E(X) = P(W) * A(W) + P(W') * A(W') = \frac{11}{13} * 4 + \frac{2}{13} * -14 = 1.230769$
+
+Answer: $1.23
+
+```{r}
+(-14 * (2/13)) + (4 * (11/13))
+```
+## Step 2
+If you played this game 759 times how much would you expect to win or lose? Round your answer to two decimal places. Losses must be expressed as negative values.
+
+### Answer:
+Calculation on rounded expected value from Step 1
+
+$E(X) \times Events = 1.23 * 759 = 933.57$
+
+Answer: $933.57 (winnings)
+```{r}
+1.23 * 759
+```
