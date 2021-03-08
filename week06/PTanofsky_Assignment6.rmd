@@ -1,7 +1,7 @@
 ---
 title: 'DATA 605: Assignment 6'
 subtitle: 'CUNY Spring 2021'
-author: "Philip Tanofsky"
+author: "Philip Tanofsky" 
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output: pdf_document
 ---
