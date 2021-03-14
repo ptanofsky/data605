@@ -1,0 +1,182 @@
+---
+title: 'DATA 605: Assignment 7'
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: pdf_document
+---
+
+# Problem 1
+Let $X_1$, $X_2$, ... , $X_n$ be $n$ mutually independent random variables, each of which is uniformly distributed on the integers from 1 to $k$. Let $Y$ denote the minimum of the $X_i$’s. Find the distribution of $Y$.
+
+### Answer
+
+The goal is to find the distribution function $m(j) = P(Y = j)$, in which $j$ is equal to the minimum value (aka $Y$). To do this, we must determine the number of ways the $X_i$ variables can be assigned values between $j$ and $k$ with at least one of the $X_i$ values being $j$, then divide that number by the total possible way the $X_i$s can be assigned values between 1 and $k$.
+
+Based on the prompt, each random variable $X_i$ is uniformly distributed integers from 1 to $k$, thus the count of possibilities for each variable is $k$. Given this understanding, the total number of outcomes for the entire collection of random variables is $k^n$.
+
+To find the numerator, let's start with $Y = 1$. The total number of ways of $Y = 1$ is calculated by $k^n - (k - 1)^n$ because $k^n$ represents all the possibilities and $(k - 1)^n$ represents all the possibilities where none of the $X_i$ variables are equal to 1.
+
+Following the same pattern for $Y = 2$, the total number of possibilities in which 2 is the minimum and occurs at least once is $k^n - (k-2)^n - (k^n - (k - 1)^n)$. Like above, $k^n - (k-2)^n$ is all possibilities minus all outcomes in which 2 or fewer is not a result. And then subtract that by $k^n - (k - 1)^n$ to remove all the scenarios in which 1 occurs. So $k^n - (k-2)^n - (k^n - (k - 1)^n)$ represents all the scenarios in which 2 as the minimum value occurs at least once.
+
+This pattern for $Y = j$ then results in $(k-j+1)^n - (k-j)^n$, for a minimum value of $j$. We already determined the denominator, so the distribution function is ...
+
+$$
+For 1 \leq j \leq k, m(j) = \frac{(k-j+1)^n-(k-j)^n}{k^n}
+$$
+
+\newpage
+
+# Problem 2
+Your organization owns a copier (future lawyers, etc.) or MRI (future doctors). This machine has a manufacturer’s expected lifetime of 10 years. This means that we expect one failure every ten years. (Include the probability statements and R Code for each part.).
+
+## A. Geometric
+
+What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as a geometric. (Hint: the probability is equivalent to not failing during the first 8 years.)
+
+$$
+P(X = n) = q^{n - 1} \times p 
+$$
+
+And given that $P(X > 8) = 1 - P(X \leq 8)$ and $P(X \leq k) = 1 - q^{k+1}$, then $P(X > k) = q^{k+1}$, or $P(X > 8) = 0.9^{8+1}$
+
+```{r warning=F, message=F}
+# Probabiliy of failure 1/10
+p <- .1
+# q is 1 - p
+q <- 1 - p
+# Years
+n <- 8
+
+# Probability of 8 failures (in this case failure means not breaking) before a success (machine breaking) does occur for a probability of .1
+prob <- pgeom(n, p, lower.tail = FALSE)
+prob
+
+pprob <- q^(n+1)
+pprob
+```
+
+**Probability:** `r prob`.
+
+Expected value formula: $E(X) = \frac{1}{p}$, so $E(X) = \frac{1}{.1}$
+
+```{r warning=F, message=F}
+ev <- 1 / p
+```
+
+**Expected value:** `r ev`.
+
+Standard deviation formula: $\sigma = \sqrt{\frac{1-p}{p^2}}$, so $\sigma = \sqrt{\frac{1-0.1}{0.1^2}}$
+
+```{r warning=F, message=F}
+sd <- sqrt((1-p)/(p^2))
+```
+
+**Standard deviation:** `r sd`.
+
+\newpage
+
+## B. Exponential
+
+What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as an exponential.
+
+
+$P(X \leq k) = 1 - e^{\frac{-k}{\mu}}, where\ \mu = \frac{1}{\lambda}$. The failure rate is $\lambda = 0.1$ and $P(X > 8) = 1 - P(X \leq 8)$, so $P(X > 8) = 1 - (1 - e^{\frac{-8}{\frac{1}{0.1}}})$
+
+```{r warning=F, message=F}
+lambda <- p
+
+prob <- 1 - (1 - (exp(-n/(1/lambda))))
+prob
+
+pprob <- pexp(n, lambda, lower.tail=FALSE)
+pprob
+```
+
+**Probability:** `r prob`.
+
+Expected value formula: $E(X) = \frac{1}{\lambda}$, so $E(X) = \frac{1}{.1}$
+
+```{r warning=F, message=F}
+ev <- 1 / p
+```
+
+**Expected value:** `r ev`.
+
+Standard deviation formula: $\sigma = \sqrt{(\frac{1}{\lambda})^2}$, so $\sigma = \sqrt{(\frac{1}{0.1})^2}$
+
+```{r warning=F, message=F}
+sd <- sqrt((1/.1)^2)
+```
+
+**Standard deviation:** `r sd`.
+
+\newpage
+
+## C. Binomial
+
+What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a binomial. (Hint: 0 success in 8 years)
+
+$b(n,p,k) = {n \choose k} \times p^k \times q^{n-k}$, thus ${8 \choose 0} \times 0.1^0 \times .9^{8-0}$
+
+```{r warning=F, message=F}
+k <- 0
+
+prob <- choose(n, k) * p^k * q^n
+prob
+
+pprob <- dbinom(k, n, p)
+pprob
+```
+
+**Probability:** `r prob`.
+
+Expected value formula: $E(X) = n \times p$, so $E(X) = 8 \times 0.1$
+
+```{r warning=F, message=F}
+ev <- n * p
+```
+
+**Expected value:** `r ev`.
+
+Standard deviation formula: $\sigma = \sqrt{np(1-p)}$, so $\sigma = \sqrt{8 \times 0.1 \times 0.9}$
+
+```{r warning=F, message=F}
+sd <- sqrt(8 * .1 * .9)
+```
+
+**Standard deviation:** `r sd`.
+
+\newpage
+
+## D. Poisson
+
+What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a Poisson.
+
+$P(X = k) = \frac{\lambda^k}{k!}e^{-\lambda}$, thus $P(X = 0) = \frac{0.1^0}{0!}e^{-.1}$ would be the probability of failure in a single interval, in this case one year. So to calculate the probability of 0 failures for eight years, $P(X = 0)^8 = (\frac{0.1^0}{0!}e^{-.1})^8$
+
+```{r warning=F, message=F}
+prob <- ((0.1^0 / factorial(0)) * exp(-0.1))^8
+prob
+
+pprob <- ppois(0, 0.1)^8
+pprob
+```
+
+**Probability:** `r prob`.
+
+Expected value formula: $E(X) = \lambda$, so $E(X) = \lambda \times 8$ as there are 8 trials.
+
+```{r warning=F, message=F}
+ev <- n * p
+```
+
+**Expected value:** `r ev`.
+
+Standard deviation formula: $\sigma = E(X)$ in Poisson distribution, so $\sigma = \sqrt{\lambda \times 8}$
+
+```{r warning=F, message=F}
+sd <- sqrt(ev)
+```
+
+**Standard deviation:** `r sd`.
