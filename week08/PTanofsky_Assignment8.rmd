@@ -1,0 +1,151 @@
+---
+title: 'DATA 605: Assignment 8'
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: pdf_document
+---
+
+# Problem 11 page 303
+A company buys 100 lightbulbs, each of which has an exponential lifetime of 1000 hours. What is the expected time for the first of these bulbs to burn out? (See Exercise 10.)
+
+## Answer
+As the hint suggests, using Exercise 10, the 100 lightbulbs are the $X_1, X_2, ..., X_n$ independent random variables. Each has an exponential density with mean $\mu$. $M$ will be the minimum value of $X_j$. The density for $M$ is exponential with mean $\mu/n$.
+
+$n = 100$
+
+$\mu = 1000$
+
+As $E(M) = \mu/n$, then $1000/100$
+
+```{r}
+n <- 100
+mu <- 1000
+M <- mu / n
+```
+
+**Answer:** $E(M)=$ `r M` hours is the expected time for the first of these bulbs to burn out.
+
+# Problem 14 page 303
+Assume that $X_1$ and $X_2$ are independent random variables, each having an exponential density with parameter $\lambda$. Show that $Z = X_1 - X_2$ has density $f_Z(z) = (1/2)\lambda e^{-\lambda |z|}.$
+
+## Answer
+
+For simplicity, $X_1 = X$ and $X_2 = Y$ in the solution below.
+
+As done in Example 7.4 of the textbook page 292, let's define the density function for $f_{X}(x)$ and $f_{Y}(x)$.
+
+$$
+f_{X}(x) = f_{Y}(x) = \begin{cases}
+  \lambda e^{-\lambda x}, & \text{if } x \geq 0, \\
+  0, & \text{otherwise}.
+\end{cases} 
+$$
+Using the convolutional formula as defined in textbook Example 7.3 (page 292) and replacing Z with W, so as not to confuse with the problem.
+$$
+\begin{split}
+W = X + Y \\
+f_W(w) =\int_{-\infty}^{\infty} f_{X}(x)f_{Y}(w-x)dx
+\end{split}
+$$
+Now, consider the sum of a positive $X$ and a negative $Y$. Then apply the convolutional formula.
+
+$$
+\begin{split}
+Z = X + (-Y) \\
+f_Z(z) =\int_{-\infty}^{\infty} f_{X}(x)f_{-Y}(z-x)dx \\
+and\ given\ f_{-Y}(z-x) = f_Y(x-z) \\
+f_Z(z) =\int_{-\infty}^{\infty} f_{X}(x)f_{Y}(x-z)dx
+\end{split}
+$$
+Starting with $z < 0$. 
+
+$$
+\begin{split}
+f_Z(z) =\int_{0}^{\infty} \lambda e^{-\lambda x}\lambda e^{-\lambda(x-z)}dx \\
+= \lambda e^{\lambda z}\int_{0}^{\infty} \lambda e^{-2\lambda x}dx \\
+= \frac{\lambda}{2} e^{\lambda z},\ for\ z < 0 
+\end{split}
+$$
+And then solve for $z \geq 0$. Start by solving for $-Z$. 
+
+$$
+\begin{split}
+Z = X - Y \\
+-Z = Y - X
+\end{split}
+$$
+Because X and Y are independent and have the same distribution, then Z and -Z will have the same distribution. As we've solved for $z < 0$ and now $z \geq 0$, the distribution must be symmetric around zero. 
+
+$$
+\begin{split}
+f_Z(z) = f_Z(-z) \\
+= \frac{\lambda}{2} e^{-\lambda z},\ for\ z \geq 0 
+\end{split}
+$$
+
+Now combining $f_Z(z)$ for $z < 0$ and $z \geq 0$ results in
+
+$$
+f_Z(z) = \frac{1}{2}\lambda e^{-\lambda |z|}
+$$
+
+
+Used https://www.youtube.com/watch?v=f8Nli1AfygM as guide.
+
+# Problem 1 page 320-321
+Let $X$ be a continuous random variable with mean $\mu = 10$ and variance $\sigma^2 = 100/3$. Using Chebyshev's Inequality, find an upper bound for the following probabilities.
+
+$P(|X-\mu|\geq\epsilon) \leq \frac{\sigma^2}{\epsilon^2}$
+
+$\mu = 10$
+
+$\sigma^2 = 100/3$
+
+## Part A:
+
+$P(|X-10|\geq 2) \leq \frac{100/3}{4} = \frac{25}{3}$
+
+```{r}
+sigma_squared <- 100 / 3
+ep.a <- 2
+a.result <- sigma_squared / ep.a^2
+```
+
+**Answer:** Upper bound is 1, as probability cannot be greater than 1, as result is `r a.result`.
+
+## Part B:
+
+$P(|X-10|\geq 5) \leq \frac{100/3}{25} = \frac{4}{3}$
+
+```{r}
+ep.b <- 5
+b.result <- sigma_squared / ep.b^2
+```
+
+**Answer:** Upper bound is 1, as probability cannot be greater than 1, as result is `r b.result`.
+
+## Part C:
+
+$P(|X-10|\geq 9) \leq \frac{100/3}{81} = \frac{100}{243}$
+
+```{r}
+ep.c <- 9
+c.result <- sigma_squared / ep.c^2
+```
+
+**Answer:** Upper bound is `r c.result`.
+
+## Part D:
+
+$P(|X-10|\geq 20) \leq \frac{100/3}{400} = \frac{1}{12}$
+
+```{r}
+ep.d <- 20
+d.result <- sigma_squared / ep.d^2
+```
+
+**Answer:** Upper bound is `r d.result`.
+
