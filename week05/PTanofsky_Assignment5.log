@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2021.2.28)  28 FEB 2021 11:13
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2021.2.28)  5 MAR 2021 19:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -165,7 +165,7 @@ tim
 )
 (/Users/philiptanofsky/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.s
 ty
-Package: hyperref 2021-02-10 v7.00j Hypertext links for LaTeX
+Package: hyperref 2021-02-27 v7.00k Hypertext links for LaTeX
 
 (/Users/philiptanofsky/Library/TinyTeX/texmf-dist/tex/generic/ltxcmds/ltxcmds.s
 ty
@@ -219,13 +219,13 @@ Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
 \Hy@pagecounter=\count266
 
 (/Users/philiptanofsky/Library/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def
-File: pd1enc.def 2021-02-10 v7.00j Hyperref: PDFDocEncoding definition (HO)
+File: pd1enc.def 2021-02-27 v7.00k Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
 )
 (/Users/philiptanofsky/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref-l
 angpatches.def
-File: hyperref-langpatches.def 2021-02-10 v7.00j Hyperref: patches for babel la
+File: hyperref-langpatches.def 2021-02-27 v7.00k Hyperref: patches for babel la
 nguages
 )
 (/Users/philiptanofsky/Library/TinyTeX/texmf-dist/tex/generic/intcalc/intcalc.s
@@ -238,7 +238,7 @@ Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
 )
 \Hy@SavedSpaceFactor=\count267
 (/Users/philiptanofsky/Library/TinyTeX/texmf-dist/tex/latex/hyperref/puenc.def
-File: puenc.def 2021-02-10 v7.00j Hyperref: PDF Unicode definition (HO)
+File: puenc.def 2021-02-27 v7.00k Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
 ... no UTF-8 mapping file for font encoding PU
 )
@@ -293,7 +293,7 @@ Package hyperref Info: Driver (autodetected): hpdftex.
 
 (/Users/philiptanofsky/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hpdftex.de
 f
-File: hpdftex.def 2021-02-10 v7.00j Hyperref driver for pdfTeX
+File: hpdftex.def 2021-02-27 v7.00k Hyperref driver for pdfTeX
 
 (/Users/philiptanofsky/Library/TinyTeX/texmf-dist/tex/latex/base/atveryend-ltx.
 sty
@@ -567,61 +567,68 @@ Package hyperref Warning: Difference (2) between bookmark levels is greater
 [3]
 
 Package hyperref Warning: Difference (2) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 387.
+(hyperref)                than one, level fixed on input line 396.
+
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 4
+06.
+(/Users/philiptanofsky/Library/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
+) [4]
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 474.
+
+[5]
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 542.
+
+[6]
+
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 583.
 
 
 Package hyperref Warning: Difference (2) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 404.
+(hyperref)                than one, level fixed on input line 645.
 
-[4]
-
-Package hyperref Warning: Difference (2) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 417.
-
-
-Package hyperref Warning: Difference (2) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 433.
-
-
-Package hyperref Warning: Difference (2) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 450.
-
-[5] (./PTanofsky_Assignment5.aux)
+[7] [8] (./PTanofsky_Assignment5.aux)
 Package rerunfilecheck Info: File `PTanofsky_Assignment5.out' has not changed.
-(rerunfilecheck)             Checksum: 7FB74F2A56EE57EEA5B3F3CD31AC0E7F;1510.
+(rerunfilecheck)             Checksum: A714BF0C735DAD5990C04F477E15421F;1510.
  ) 
 Here is how much of TeX's memory you used:
- 10389 strings out of 480971
- 152825 string characters out of 5906347
- 458505 words of memory out of 5000000
- 27373 multiletter control sequences out of 15000+600000
- 446673 words of font info for 67 fonts, out of 8000000 for 9000
+ 10463 strings out of 480971
+ 154577 string characters out of 5906347
+ 459170 words of memory out of 5000000
+ 27414 multiletter control sequences out of 15000+600000
+ 447038 words of font info for 68 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  71i,6n,74p,358b,350s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.en
-c}{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-maths
-y.enc}{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-m
-athit.enc}{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/
-lm-rm.enc}{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/
-lm-mathex.enc}</Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/type1/pub
-lic/lm/lmbx10.pfb></Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/type1
-/public/lm/lmbx12.pfb></Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/t
-ype1/public/lm/lmex10.pfb></Users/philiptanofsky/Library/TinyTeX/texmf-dist/fon
-ts/type1/public/lm/lmmi10.pfb></Users/philiptanofsky/Library/TinyTeX/texmf-dist
-/fonts/type1/public/lm/lmmi7.pfb></Users/philiptanofsky/Library/TinyTeX/texmf-d
-ist/fonts/type1/public/lm/lmr10.pfb></Users/philiptanofsky/Library/TinyTeX/texm
-f-dist/fonts/type1/public/lm/lmr12.pfb></Users/philiptanofsky/Library/TinyTeX/t
-exmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/philiptanofsky/Library/TinyTe
-X/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/philiptanofsky/Library/Tiny
-TeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/philiptanofsky/Library/
-TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb></Users/philiptanofsky/Libra
-ry/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></Users/philiptanofsky/L
-ibrary/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></Users/philiptanofs
-ky/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on PTanofsky_Assignment5.pdf (5 pages, 252301 bytes).
+{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.e
+nc}{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.e
+nc}{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-math
+sy.enc}{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-
+mathit.enc}{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm
+/lm-rm.enc}{/Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm
+/lm-mathex.enc}</Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/type1/pu
+blic/lm/lmbx10.pfb></Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/type
+1/public/lm/lmbx12.pfb></Users/philiptanofsky/Library/TinyTeX/texmf-dist/fonts/
+type1/public/lm/lmex10.pfb></Users/philiptanofsky/Library/TinyTeX/texmf-dist/fo
+nts/type1/public/lm/lmmi10.pfb></Users/philiptanofsky/Library/TinyTeX/texmf-dis
+t/fonts/type1/public/lm/lmmi7.pfb></Users/philiptanofsky/Library/TinyTeX/texmf-
+dist/fonts/type1/public/lm/lmr10.pfb></Users/philiptanofsky/Library/TinyTeX/tex
+mf-dist/fonts/type1/public/lm/lmr12.pfb></Users/philiptanofsky/Library/TinyTeX/
+texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/philiptanofsky/Library/TinyT
+eX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/philiptanofsky/Library/Tin
+yTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/philiptanofsky/Library
+/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb></Users/philiptanofsky/Libr
+ary/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></Users/philiptanofsky/
+Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></Users/philiptanof
+sky/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
+Output written on PTanofsky_Assignment5.pdf (8 pages, 268342 bytes).
 PDF statistics:
- 194 PDF objects out of 1000 (max. 8388607)
- 171 compressed objects within 2 object streams
- 48 named destinations out of 1000 (max. 500000)
+ 244 PDF objects out of 1000 (max. 8388607)
+ 217 compressed objects within 3 object streams
+ 77 named destinations out of 1000 (max. 500000)
  129 words of extra memory for PDF output out of 10000 (max. 10000000)
 
