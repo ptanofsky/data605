@@ -1,0 +1,37 @@
+---
+title: 'DATA 605: Assignment 10'
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: pdf_document
+---
+
+# Problem: Gambler's Ruin
+
+Smith is in jail and has 1 dollar; he can get out on bail if he has 8 dollars. A guard agrees to make a series of bets with him. If Smith bets A dollars, he wins A dollars with probability .4 and loses A dollars with probability .6.
+
+Find the probability that he wins 8 dollars before losing all of his money if
+
+## Part A: Timid strategy
+
+He bets 1 dollar each time.
+
+### Answer
+
+## Part B: Bold strategy
+
+He bets, each time, as much as possible but not more than necessary to bring his fortune up to 8 dollars.
+
+### Answer
+
+## Part C: Better strategy
+
+Which strategy gives Smith the better chance of getting out of jail?
+
+### Answer
+
+
+
+
