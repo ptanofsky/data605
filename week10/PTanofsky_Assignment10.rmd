@@ -24,6 +24,8 @@ Using the formula on page 489, Section 12.2
 
 $q_z = \frac{(q/p)^z-1}{(q/p)^M-1}$
 
+Starting with 1 dollar, $z=1$. $q_z$ is the probability the gambler's stake reaches $M$ without ever having reached 0. $p$ is the probability of a win, and $q$ is the probability of a loss.
+
 ```{r}
 p <- .4
 q <- 1 - p
@@ -34,6 +36,8 @@ result_a <- ((q/p)^z - 1) / ((q/p)^M - 1)
 
 result_a
 ```
+
+Probability of winning 8 dollars is `r result_a`.
 
 ## Part B: Bold strategy
 
@@ -49,6 +53,37 @@ result_b <- p^3
 result_b
 ```
 
+Probability of winning 8 dollars is `r result_b`.
+
+Using a general matrix object for the Markov transition matrix.
+
+```{r warning=F, message=F}
+mat <- matrix(c(.6, 0, .4, 0, 0, .6, 0, 0, .4, 0, .6, 0, 0, 0, .4), nrow=3, byrow=TRUE)
+stateNames <- c("0", "1", "2", "4", "8")
+row.names(mat) <- c("1", "2", "4")
+colnames(mat) <- stateNames
+
+mat
+```
+
+After first step, probability of going from 1 to 2, 0.4.
+
+```{r warning=F, message=F}
+mat2 <- mat^2
+mat2
+```
+
+After second step, probability of going from 2 to 4, 0.16.
+
+```{r warning=F, message=F}
+mat3 <- mat^3
+mat3
+
+```
+
+After third step, probability of going from 4 to 8, 0.064.
+
+Confirmation: Probability of winning 8 dollars is `r result_b`.
 
 ## Part C: Better strategy
 
@@ -56,7 +91,7 @@ Which strategy gives Smith the better chance of getting out of jail?
 
 ### Answer
 
-The **bold strategy** gives Smith a slighly better chance of getting out of jail based on the betting arrangement. The bold strategy gives Smith a probability of `r result_b`, over 6% chance,  while the timid strategy gives Smith a probability of `r result_a`, a hair over 2% chance.
+The **bold strategy** gives Smith a better chance of getting out of jail based on the betting arrangement. The bold strategy gives Smith a probability of `r result_b`, over 6% chance,  while the timid strategy gives Smith a probability of `r result_a`, a hair over 2% chance.
 
 
 
