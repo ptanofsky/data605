@@ -20,11 +20,35 @@ He bets 1 dollar each time.
 
 ### Answer
 
+Using the formula on page 489, Section 12.2
+
+$q_z = \frac{(q/p)^z-1}{(q/p)^M-1}$
+
+```{r}
+p <- .4
+q <- 1 - p
+z <- 1
+M <- 8
+
+result_a <- ((q/p)^z - 1) / ((q/p)^M - 1)
+
+result_a
+```
+
 ## Part B: Bold strategy
 
 He bets, each time, as much as possible but not more than necessary to bring his fortune up to 8 dollars.
 
 ### Answer
+
+This scenario requires Smith to win the bet 3 times in a row without losing. 1 doubled is 2, 2 doubled is 4, and 4 doubled is 8. That's the only scenario in which he reaches 8 dollars. Otherwise, he loses. So the probability of reaching 8 is .4 to the third power.
+
+```{r}
+result_b <- p^3
+
+result_b
+```
+
 
 ## Part C: Better strategy
 
@@ -32,6 +56,7 @@ Which strategy gives Smith the better chance of getting out of jail?
 
 ### Answer
 
+The **bold strategy** gives Smith a slighly better chance of getting out of jail based on the betting arrangement. The bold strategy gives Smith a probability of `r result_b`, over 6% chance,  while the timid strategy gives Smith a probability of `r result_a`, a hair over 2% chance.
 
 
 
