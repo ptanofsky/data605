@@ -1,0 +1,51 @@
+---
+title: "DATA 605 Discussion Week 11 (12)"
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: pdf_document
+---
+
+```{r warning=F, message=F}
+library(tidyverse)
+library(stats)
+library(broom)
+library(ggplot2)
+
+nba_data <- read_csv("https://raw.githubusercontent.com/fivethirtyeight/nba-player-advanced-metrics/master/nba-data-historical.csv")
+
+nba_data <- nba_data %>% filter(year_id >= 2016) %>% select( 'P/36',  'A/36', 'R/36', 'Raptor O')
+
+nba_data <- rename_with(nba_data, ~ gsub(" ", "_", .x, fixed = TRUE))
+nba_data <- rename_with(nba_data, ~ gsub("/", "_", .x, fixed = TRUE))
+
+nba_data$P_36 <- as.numeric(nba_data$P_36)
+nba_data$A_36 <- as.numeric(nba_data$A_36)
+nba_data$R_36 <- as.numeric(nba_data$R_36)
+
+nba_data <- na.omit(nba_data)
+
+nba_data <- nba_data %>% filter(P_36 <= 50)
+
+dim(nba_data)
+
+summary(nba_data)
+
+plot(x = nba_data$P_36, y = nba_data$Raptor_O, main = "Raptor Offensive Rating by Points per 36")
+
+plot(x = nba_data$A_36, y = nba_data$Raptor_O, main = "Raptor Offensive Rating by Assists per 36")
+
+plot(x = nba_data$R_36, y = nba_data$Raptor_O, main = "Raptor Offensive Rating by Rebounds per 36")
+
+model <- lm(Raptor_O ~ ., data=nba_data)
+#model
+
+summary(model)
+
+model.diag.metrics <- augment(model)
+head(model.diag.metrics)
+
+#autoplot(model)
+```
