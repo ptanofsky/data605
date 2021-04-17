@@ -1,51 +1,103 @@
 ---
-title: "DATA 605 Discussion Week 11 (12)"
+title: "DATA 605 Discussion Week 12"
 subtitle: 'CUNY Spring 2021'
 author: "Philip Tanofsky" 
 date: "`r format(Sys.time(), '%d %B %Y')`"
 header-includes:
    - \usepackage{amsmath}
-output: pdf_document
+output: html_document
 ---
+
+# Prompt
+
+Using R, build a  regression model for data that interests you. Conduct residual analysis.  Was the linear model appropriate? Why or why not?
+
+# Regression Model
+
+I chose to use some NBA team data easily accessed using the $NBAloveR$ package. The goal is to determine the relationship between the Offensive Rating, Defensive Rating, and Rating Difference as compared to the team's win total in a given season. Rating Difference is a simple derived variable. 
+
+- Offensive Rating: From basketball-reference.com, for teams it is points scored per 100 possessions.
+
+- Defensive Rating: From basketball-reference.com, for teams it is points allowed per 100 possessions.
+
+- Rating Difference: Offensive Rating minus Defensive Rating. The larger the value, the better for a team.
+
+### Load Libraries
 
 ```{r warning=F, message=F}
 library(tidyverse)
-library(stats)
-library(broom)
 library(ggplot2)
-
-nba_data <- read_csv("https://raw.githubusercontent.com/fivethirtyeight/nba-player-advanced-metrics/master/nba-data-historical.csv")
-
-nba_data <- nba_data %>% filter(year_id >= 2016) %>% select( 'P/36',  'A/36', 'R/36', 'Raptor O')
-
-nba_data <- rename_with(nba_data, ~ gsub(" ", "_", .x, fixed = TRUE))
-nba_data <- rename_with(nba_data, ~ gsub("/", "_", .x, fixed = TRUE))
-
-nba_data$P_36 <- as.numeric(nba_data$P_36)
-nba_data$A_36 <- as.numeric(nba_data$A_36)
-nba_data$R_36 <- as.numeric(nba_data$R_36)
-
-nba_data <- na.omit(nba_data)
-
-nba_data <- nba_data %>% filter(P_36 <= 50)
-
-dim(nba_data)
-
-summary(nba_data)
-
-plot(x = nba_data$P_36, y = nba_data$Raptor_O, main = "Raptor Offensive Rating by Points per 36")
-
-plot(x = nba_data$A_36, y = nba_data$Raptor_O, main = "Raptor Offensive Rating by Assists per 36")
-
-plot(x = nba_data$R_36, y = nba_data$Raptor_O, main = "Raptor Offensive Rating by Rebounds per 36")
-
-model <- lm(Raptor_O ~ ., data=nba_data)
-#model
-
-summary(model)
-
-model.diag.metrics <- augment(model)
-head(model.diag.metrics)
-
-#autoplot(model)
+library(NBAloveR)
 ```
+
+### Load Data
+
+As the package only allows to pull data from a single franchise, I selected five just to keep the code readable. I selected the Boston Celtics, Los Angeles Lakers, Chicago Bulls, San Antonio Spurs, and Philadelphia 76ers.
+
+```{r warning=F, message=F}
+bos <- getTeamHistory(team_code = "bos")
+lal <- getTeamHistory(team_code = "lal")
+chi <- getTeamHistory(team_code = "chi")
+sas <- getTeamHistory(team_code = "sas")
+phi <- getTeamHistory(team_code = "phi")
+
+nba <- rbind(bos, lal)
+nba <- rbind(nba, chi)
+nba <- rbind(nba, sas)
+nba <- rbind(nba, phi)
+```
+
+### Data Derivation
+
+Derive the attribute Rating Difference.
+
+```{r warning=F, message=F}
+nba$RtgDif <- nba$ORtg - nba$DRtg
+
+head(nba)
+```
+
+### EDA Plots
+
+Plot each rating attribute against team wins.
+
+```{r warning=F, message=F}
+nba %>%
+  ggplot(aes(x=ORtg, y=W)) + 
+  geom_point() + 
+  labs(title = 'Offensive Rating vs Wins') + geom_smooth(method='lm', formula= y~x)
+
+nba %>%
+  ggplot(aes(x=DRtg, y=W)) + 
+  geom_point() + 
+  labs(title = 'Defensive Rating vs Wins') + geom_smooth(method='lm', formula= y~x)
+
+nba %>%
+  ggplot(aes(x=RtgDif, y=W)) + 
+  geom_point() + 
+  labs(title = 'Rating Difference vs Wins') + geom_smooth(method='lm', formula= y~x)
+```
+
+For Offensive Rating, a slight positive linear trend is visible, yet the scatterplot indicates wide variability in the relationship. Similar for Defensive Rating, except the linear relationship is negative. As for Rating Difference, the scatterplot shows a strong positive relationship between the rating difference and the team wins.
+
+### Correlation
+
+```{r warning=F, message=F}
+corr <- cor(nba$RtgDif, nba$W, use = "complete.obs")
+corr
+```
+
+The correlation between Rating Difference and team wins is above 90%, indicating a high correlation between the two variables.
+
+### Linear Regression Models
+
+```{r warning=F, message=F}
+model_ortg <- lm(W ~ ORtg, data=nba)
+summary(model_ortg)
+model_drtg <- lm(W ~ DRtg, data=nba)
+summary(model_drtg)
+model_rtgdif <- lm(W ~ RtgDif, data=nba)
+summary(model_rtgdif)
+```
+
+After generating the linear regression models for each rating variable against the team wins, a clear relationship is identified between the rating difference and the team wins with an R-squared value of greater than 83%. This result indicates the Rating Difference does explain most of the variation in the Wins variable. I do believe for the derived rating difference value, the linear model is appropriate. Alone, the Offensive Rating, nor the Defensive Rating, indicates whether a team is good or not. A high-scoring team may also be very bad at defensive. By taking the difference, teams with a good offense and a good defense would expect to be considered "good", and thus win more games. Also, by taking the difference, the pace of play will not impact the model quite as much. A high scoring team in the 1990s may not be the same as a high-scoring team in the 2010s. By taking the difference, the style and pace of games for a certain era is largely masked.
