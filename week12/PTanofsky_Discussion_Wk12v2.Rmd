@@ -1,0 +1,137 @@
+---
+title: "DATA 605 Discussion Week 12"
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: html_document
+---
+
+# Prompt
+
+Using R, build a multiple regression model for data that interests you.  Include in this model at least one quadratic term, one dichotomous term, and one dichotomous vs. quantitative interaction term. Interpret all coefficients. Conduct residual analysis.  Was the linear model appropriate? Why or why not?
+
+```{r warning=F, message=F}
+library(tidyverse)
+```
+
+## Dataset
+
+I'll admit, I was just looking for a relatively simple dataset that came with R. Combing through the options in data(), I found $swiss$. According to this site https://stat.ethz.ch/R-manual/R-patched/library/datasets/html/swiss.html, the dataset is a standardized fertility measure and socio-economic indicators for each of 47 French-speaking provinces of Switzerland at about 1888.
+
+- Fertility: Common standardized fertility measure. Used as dependent variable in this analysis.
+- Agriculture: Percent of males involved in agriculture as occupation
+- Examination: Percent of draftees receiving highest mark on army examination
+- Education: Percent education beyond primary school for draftees.
+- Catholic: Percent Catholic (as opposed to Protestant)
+- Infant.Mortality: Percent of live births who live less than 1 year
+
+```{r warning=F, message=F}
+data("swiss")
+sw <- swiss
+
+dim(sw)
+summary(sw)
+```
+
+Dimensions output confirms 6 variables and 47 instances. Summary output confirms no missing data and all values are between 0 and 100, expected as each value is a percentage.
+
+## EDA
+
+Following scatterplots indicate the relationship of the independent variables with the dependent variable (Fertility).
+
+```{r warning=F, message=F}
+sw %>%
+  ggplot(aes(x=Agriculture, y=Fertility)) + 
+  geom_point() + 
+  labs(title = 'Agriculture vs Fertility') + geom_smooth(method='lm', formula= y~x)
+
+sw %>%
+  ggplot(aes(x=Examination, y=Fertility)) + 
+  geom_point() + 
+  labs(title = 'Examination vs Fertility') + geom_smooth(method='lm', formula= y~x)
+
+sw %>%
+  ggplot(aes(x=Education, y=Fertility)) + 
+  geom_point() + 
+  labs(title = 'Education vs Fertility') + geom_smooth(method='lm', formula= y~x)
+
+sw %>%
+  ggplot(aes(x=Infant.Mortality, y=Fertility)) + 
+  geom_point() + 
+  labs(title = 'Infant.Mortality vs Fertility') + geom_smooth(method='lm', formula= y~x)
+
+sw %>%
+  ggplot(aes(x=Catholic, y=Fertility)) + 
+  geom_point() + 
+  labs(title = 'Catholic vs Fertility') + geom_smooth(method='lm', formula= y~x)
+```
+
+- Increasing Agriculture percentage indicates a slightly positive linear relationship with Fertility.
+
+- Increasing Examination percentage indicates a clear negative relationship with Fertility.
+
+- Increasing Education percentage indicates a negative relationship with Fertility but the relationship appears to be driven by one extreme outlier and 4 other outlier points.
+
+- Infant.Mortality percentage shows a positive linear relationship with Fertility, but looking at the plot, I would argue the relationship is quite small as the points appear evenly distributed and not necessarily following a linear direction.
+
+- Increasing Catholic percentage shows a slight positive relationship with Fertility. This plot also shows that for all but 3 provinces, each province is clearly Catholic or Protestant. Thus the reason for creating the dichotomous variable.
+
+```{r warning=F, message=F}
+# Create dichotomous variable
+sw$isCatholic <- ifelse(sw$Catholic >= 50.0, "Y", "N")
+sw$isCatholicNum <- ifelse(sw$isCatholic == "Y", 1, 0)
+```
+
+As the scatterplot above shows, most provinces are either highly Catholic or highly Protestant. With that understanding, I decided to create a dichotomous variable $isCatholic$, in which each province populated by 50% or more Catholics is deemed Catholic, 'Y', with the remaining provinces labeled 'N', for not majority Catholic.
+
+```{r warning=F, message=F}
+sw %>%
+  ggplot(aes(x=isCatholic, y=Fertility)) + 
+  geom_boxplot() + 
+  labs(title = 'Is Catholic vs Fertility')
+```
+
+- IsCatholic boxplot indicates a clearly higher level of Fertility for provinces predominantly Catholic compared to those predominantly Protestant.
+
+## Create Model
+
+I naively create a multiple regression model with all the initial variables as a baseline.
+
+```{r warning=F, message=F}
+sw_lm <- lm(Fertility ~ Agriculture + Examination + Education + Catholic + Infant.Mortality, data=sw)
+summary(sw_lm)
+
+plot(sw_lm)
+```
+
+The most significant variable appears to be Education, followed by Catholic and Infant.Mortality. The adjusted R-squared is 0.671, which indicates this model describes 67% of the variability ... not bad, also not great. Looking at the plots for Residuals vs Fitted and Normal Q-Q, I think a case could be made that this linear regression model is appropriate, but could be improved.
+
+## Transform Variables
+
+In order to meet the prompt's requirements, I chose to create a quadratic term by calculating the square of Infant.Mortality.
+
+```{r warning=F, message=F}
+sw$Infant.Mortality.2 <- sw$Infant.Mortality^2
+```
+
+To create a dichotomous by quantitative variable, I've multiplied Education by isCatholic, 1 for Catholic Yes, and 0 for Catholic No. The dichotomous variable isCatholic was created earlier in the analysis based on the initial scatterplot of the Catholic variable.
+
+```{r warning=F, message=F}
+
+sw$Edu.by.IsCath <- sw$isCatholicNum * sw$Education
+```
+
+## Second Model
+
+Now, I have created a multiple regression model based on the three transformed variables.
+
+```{r warning=F, message=F}
+sw_t_lm <- lm(Fertility ~ Edu.by.IsCath + isCatholic + Infant.Mortality.2, data=sw)
+summary(sw_t_lm)
+
+plot(sw_t_lm)
+```
+
+The resulting model shows significance for each of the three variables, which is a good sign. Overall, the Adjusted R-squared is 0.5346, which means the model only accounts for 53% of the variability in the data. Yes, 53% is above 50%, but unfortunately this model does not meet the variability of the naive model used as a baseline. The selection of Education for the transformed variable may not have been the best selection given the influence of the outliers. Overall, the plot for Residuals vs Fitted isn't horrible, but not great either. The Normal Q-Q plot appears reasonable except for one extreme outlier. Given this model doesn't meet the level of the baseline model, I would judge this model not appropriate for this dataset.

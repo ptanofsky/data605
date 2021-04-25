@@ -1,0 +1,90 @@
+---
+title: "DATA 605 Discussion Week 12"
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: pdf_document
+---
+
+```{r warning=F, message=F}
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r warning=F, message=F}
+data("ToothGrowth")
+
+tg <- ToothGrowth
+
+dim(tg)
+
+summary(tg)
+```
+
+
+From: http://www.sthda.com/english/wiki/r-built-in-data-sets
+
+ToothGrowth data set contains the result from an experiment studying the effect of vitamin C on tooth growth in 60 Guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one of two delivery methods, (orange juice or ascorbic acid (a form of vitamin C and coded as VC).
+
+```{r warning=F, message=F}
+
+tg$dose.2 <- tg$dose^2
+
+tg$supp <- as.character(tg$supp)
+tg$supp[tg$supp == "OJ"] <- 0
+tg$supp[tg$supp == "VC"] <- 1
+tg$supp <- as.integer(tg$supp)
+
+tg$supp.x.dose <- tg$supp * tg$dose
+
+tg$supp <- as.factor(tg$supp)
+
+summary(tg)
+```
+
+Plots
+
+```{r warning=F, message=F}
+tg %>%
+  ggplot(aes(x=dose, y=len)) + 
+  geom_point() + 
+  labs(title = 'Offensive Rating vs Wins') + geom_smooth(method='lm', formula= y~x)
+
+tg %>%
+  ggplot(aes(x=dose.2, y=len)) + 
+  geom_point() + 
+  labs(title = 'Defensive Rating vs Wins') + geom_smooth(method='lm', formula= y~x)
+
+tg %>%
+  ggplot(aes(x=supp.x.dose, y=len)) + 
+  geom_point() + 
+  labs(title = 'Rating Difference vs Wins') + geom_smooth(method='lm', formula= y~x)
+```
+
+```{r warning=F, message=F}
+tg_lm <- lm(len ~ ., data=tg)
+summary(tg_lm)
+```
+
+```{r warning=F, message=F}
+```
+
+```{r warning=F, message=F}
+```
+
+```{r warning=F, message=F}
+```
+
+```{r warning=F, message=F}
+```
+
+```{r warning=F, message=F}
+```
+
+```{r warning=F, message=F}
+```
+
+```{r warning=F, message=F}
+```

@@ -1,0 +1,149 @@
+---
+title: "DATA 605 Assignment Week 12"
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: pdf_document
+---
+
+# Prompt
+
+The attached who.csv dataset contains real-world data from 2008. The variables included follow.
+
+- Country: name of the country
+- LifeExp: average life expectancy for the country in years
+- InfantSurvival: proportion of those surviving to one year or more
+- Under5Survival: proportion of those surviving to five years or more
+- TBFree: proportion of the population without TB.
+- PropMD: proportion of the population who are MDs
+- PropRN: proportion of the population who are RNs
+- PersExp: mean personal expenditures on healthcare in US dollars at average exchange rate
+- GovtExp: mean government expenditures per capita on healthcare, US dollars at average exchange rate
+- TotExp: sum of personal and government expenditures.
+
+```{r warning=F, message=F}
+# load libraries
+library(tidyverse)
+
+# Read in data
+who <- read_csv("who.csv")
+
+summary(who)
+```
+
+## Part 1
+
+Provide a scatterplot of LifeExp~TotExp, and run simple linear regression. Do not transform the variables. Provide and interpret the F statistics, R^2, standard error,and p-values only. Discuss whether the assumptions of simple linear regression met.
+
+```{r warning=F, message=F}
+# Scatterplot
+who %>%
+  ggplot(aes(x=TotExp, y=LifeExp)) + 
+  geom_point() + 
+  labs(title = 'Life Expectancy by Total Expenditures') + geom_smooth(method='lm', formula= y~x)
+```
+
+```{r warning=F, message=F}
+# Simple linear regression
+simple_lm <- lm(LifeExp ~ TotExp, data=who)
+
+summary(simple_lm)
+```
+
+- F statistic: Not useful given this is a single parameter model
+- R^2: Multiple R-squared is 0.2577, indicating the model explains 25.77% of the data's variation ... not good. Adjusted R-squared not important because of the single variable regression model.
+- Standard error: Using the t-values to interpret the standard errors, the standard error for the intercept is quite small indicating little variability in the intercept value. The t-value for Total Expenditure is over 8, which according to the textbook is good. But, as I've plotted the Residuals vs Fitted, I know these values are misleading.
+- p-values: Both p-values are quite small, indicating the probability of the coefficients as not relevant to the model as quite low. As mentioned in Standard Error, according to the textbook, these values represent a good model, yet the model plots and R-squared value indicate otherwise.
+
+Based on the plots: Assumptions of linear regression not met.
+
+```{r warning=F, message=F}
+plot(simple_lm)
+```
+
+## Part 2
+
+Raise life expectancy to the 4.6 power (i.e., LifeExp^4.6). Raise total expenditures to the 0.06 power (nearly a log transform, TotExp^.06). Plot LifeExp^4.6 as a function of TotExp^.06, and r re-run the simple regression model using the transformed variables. Provide and interpret the F statistics, R^2, standard error, and p-values. Which model is "better?"
+
+```{r warning=F, message=F}
+who$LifeExp.T <- who$LifeExp^4.6
+who$TotExp.T <- who$TotExp^.06
+
+who %>%
+  ggplot(aes(x=TotExp.T, y=LifeExp.T)) + 
+  geom_point() + 
+  labs(title = 'Life Expectancy by Total Expenditures (Transformed)') + geom_smooth(method='lm', formula= y~x)
+
+simple_t_lm <- lm(LifeExp.T ~ TotExp.T, data=who)
+
+summary(simple_t_lm)
+```
+
+
+- F statistic: Again, not useful given this is a single parameter model
+- R^2: Multiple R-squared is 0.7298, indicating the model explains 72.98% of the data's variation ... quite an improvement compared to the first model. Adjusted R-squared not important because of the single variable regression model.
+- Standard error: Using the t-values to interpret the standard errors, the standard error for the intercept shows a ratio greater than 15 when comparing the standard error the coefficient, indicating little variability in the intercept value. The t-value for Total Expenditure is over 22, which according to the textbook is good. Both standard error values as compared to the coefficient values are indicative of a good model because both denote little variability in the coefficient values.
+- p-values: The p-value for the intercept and Total Expenditure coefficients are very small which means the chance the coefficient value is not relevant to the model is very, very infrequent. For both values, good sign the model is valid for the dataset.
+
+The model with transformed values (second model) is better. Scatterplot above and Residuals vs Fitted plot below confirm this assessment. 
+
+```{r warning=F, message=F}
+plot(simple_t_lm)
+```
+
+## Part 3
+
+Using the results from 3, forecast life expectancy when TotExp^.06 =1.5. Then forecast life expectancy when TotExp^.06=2.5.
+
+```{r warning=F, message=F}
+result_3.1 <- simple_t_lm$coefficients[[1]] + (1.5 * simple_t_lm$coefficients[[2]])
+
+result_3.1 <- result_3.1^(1/4.6)
+  
+result_3.1
+```
+
+Life expectancy when TotExp^.06=1.5 is `r result_3.1`.
+
+```{r warning=F, message=F}
+result_3.2 <- simple_t_lm$coefficients[[1]] + (2.5 * simple_t_lm$coefficients[[2]])
+
+result_3.2 <- result_3.2^(1/4.6)
+
+result_3.2
+```
+
+Life expectancy when TotExp^.06=2.5 is `r result_3.2`.
+
+## Part 4
+
+Build the following multiple regression model and interpret the F Statistics, R^2, standard error, and p-values. How good is the model?
+
+LifeExp = b0 + (b1 x PropMd) + (b2 x TotExp) + b3 x PropMD x TotExp
+
+```{r warning=F, message=F}
+mult_lm <- lm(LifeExp ~ PropMD + TotExp + (PropMD * TotExp), data=who)
+
+summary(mult_lm)
+```
+
+- F statistic: The model results in a value of 34.49 on 3 and 186 degrees of freedom. According to the textbook, "the F-test compares the current model to a model with one fewer predictor. If the current model is better than the reduced model, the p-value will be small." Given the p-value is quite small, this model would be better than a reduced model.
+- R^2: The multiple R-squared value is 0.3574, and the adjusted R-squared is 0.3471. In assessing the model, these two values are not indicative of a good model. These results show the model accounts for only 35% of the variation in the data. As points of comparison to the first two models, this multiple regression model performs better than the first simple linear regression model, but much worse than the transformed simple linear regression model.
+- Standard error: Interpreting the coefficient standard error values through the t-values, the intercept appears to denote a good model. Seeing as the other t-values have absolute values of less than 10, the coefficients for the three predictor variables may not represent a good model.
+- p-values: The p-values for all 4 coefficients are quite small, typically a sign of a good model.
+
+How good is the model? Based on the R-squared values, I would not recommend this model.
+
+## Part 5
+
+Forecast LifeExp when PropMD=.03 and TotExp = 14. Does this forecast seem realistic? Why or why not?
+
+```{r warning=F, message=F}
+result_5.1 <- mult_lm$coefficients[[1]] + (0.03 * mult_lm$coefficients[[2]]) + (14 * mult_lm$coefficients[[3]]) + (0.03 * 14 * mult_lm$coefficients[[4]])
+
+result_5.1
+```
+
+Life Expectancy when PropMD=.03 and TotExp=14 is `r result_5.1`. This forecast does not seem realistic, a Life Expectancy of 107 is literally off the charts, as the maximum value from the initial dataset is 83. Also, trying to put the values into context given the raw data makes the combination unlikely. The PropMD of .03 indicates 3% of the population is medical doctors, which would be one of the higher values compared to the provided instances. The Total Expenditure of 14 is quite low compared to the original dataset as the minimum is 13 and the mean is 41696. These values indicate a country with one of the highest proportions of medical doctors and yet one of the poorest countries in personal and government expenditures. I would imagine, even with a relatively large proportion of doctors, the facilities for these doctors to treat patients would dictate a larger expenditure value, or else, these numbers indicate many doctors working in extremely poor conditions/facilities. Also, given the makeup of the regression model, the PropMD variable has quite a bit of influence on this result given the small value of TotExp ... another reason the result is not realistic.
