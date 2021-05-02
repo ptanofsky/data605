@@ -1,0 +1,87 @@
+---
+title: "DATA 605 Discussion Week 13"
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: html_document
+---
+
+# Prompt
+
+Using R, provide the solution for any exercise in either Chapter 4 or Chapter 7 of the calculus textbook.  If you are unsure of your solution, post your concerns.
+
+# Section 4.2: Exercise 9
+
+A 24 ft. ladder is leaning against a house while the base is pulled away at a constant rate of 1 ft/s.
+
+At what rate is the top of the ladder sliding down the side of the house when the base is:
+
+### Equation to relate the quantities of interest
+
+Pythagorean theorem
+
+$x^2 + y^2 = 24^2$
+
+### Take the derivative with respect to time of both sides of the equation. Remember the Chain Rule
+
+$\frac{d}{dt}(x^2) + \frac{d}{dt}(y^2) = \frac{d}{dt}(24^2)$
+
+$2x \frac{dx}{dt} + 2y \frac{dy}{dt} = 0$
+
+$x \frac{dx}{dt} + y \frac{dy}{dt} = 0$
+
+$\frac{dy}{dt} = -\frac{x}{y} \frac{dx}{dt}$
+
+
+## A: 1 foot from the house?
+```{r warning=F, message=F}
+# Using : https://www.matheno.com/calculus-1/related-rates/how-fast-is-the-ladders-top-sliding/
+# x: horizontal distance from the wall
+x <- 1
+# y: vertical distance from the floor to the ladder's top
+y <- sqrt(24^2 - x^2)
+
+# dx/dt is 1 ft/s
+dx_dt <- 1
+
+# Solving for dy/dt
+dy_dt <- -1 * (x/y) * dx_dt 
+
+```
+
+Result: `r dy_dt` ft/s.
+
+Note: Value is negative because the y value is decreasing as ladder slides down the wall.
+
+## B: 10 feet from the house?
+```{r warning=F, message=F}
+x <- 10
+y <- sqrt(24^2 - x^2)
+
+dy_dt <- -1 * (x/y) * dx_dt 
+```
+
+Result: `r dy_dt` ft/s.
+
+## C: 23 feet from the house?
+```{r warning=F, message=F}
+x <- 23
+y <- sqrt(24^2 - x^2)
+
+dy_dt <- -1 * (x/y) * dx_dt 
+```
+
+Result: `r dy_dt` ft/s.
+
+
+## D: 24 feet from the house?
+```{r warning=F, message=F}
+x <- 24
+y <- sqrt(24^2 - x^2)
+
+dy_dt <- -1 * (x/y) * dx_dt 
+```
+
+Result: 0 ft/s. At this point, the ladder is completely flat on the ground, so there is no rate in which the top of the ladder is sliding down the side of the house.
