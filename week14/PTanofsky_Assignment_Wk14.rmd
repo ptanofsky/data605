@@ -1,0 +1,130 @@
+---
+title: "DATA 605 Assignment Week 14"
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: pdf_document
+---
+
+# Prompt
+
+This week, we’ll work out some Taylor Series expansions of popular functions.
+
+For each function, only consider its valid ranges as indicated in the notes when you are computing the Taylor Series expansion. Please submit your assignment as a R-Markdown document.
+
+## Taylor Series Expansion
+
+$$f(x) = \sum_{n=0}^{\infty}\frac{f^n(a)}{n!}(x-a)^n$$
+
+$$= f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \frac{f'''(a)}{3!}(x-a)^3 + ...$$
+
+
+## Function 1
+
+$$f(x) = \frac{1}{(1-x)}$$
+Take the first few derivatives
+
+$$f'(x) = \frac{1}{(1-x)^2}$$
+$$f''(x) = \frac{2}{(1-x)^3}$$
+$$f'''(x) = \frac{6}{(1-x)^4}$$
+$$f^{(4)}(x) = \frac{24}{(1-x)^5}$$
+
+Thus, we get
+
+$$\frac{1}{(1-x)} = \frac{1}{(1-a)} + \frac{\frac{1}{(1-a)^2}}{1!}(x-a) + \frac{\frac{2}{(1-a)^3}}{2!}(x-a)^2 + \frac{\frac{6}{(1-a)^4}}{3!}(x-a)^3 + \frac{\frac{24}{(1-a)^5}}{4!}(x-a)^4 +\ ...$$
+
+Now, we select $a=0$
+
+$$\frac{1}{(1-x)} = \frac{1}{(1-0)} + \frac{\frac{1}{(1-0)^2}}{1!}(x-0) + \frac{\frac{2}{(1-0)^3}}{2!}(x-0)^2 + \frac{\frac{6}{(1-0)^4}}{3!}(x-0)^3 + \frac{\frac{24}{(1-0)^5}}{4!}(x-0)^4 +\ ...$$
+Simplify
+
+$$\frac{1}{(1-x)} = 1 + \frac{1}{1!}(x) + \frac{2}{2!}(x)^2 + \frac{6}{3!}(x)^3 + \frac{24}{4!}(x)^4 +\ ...$$
+Simplify some more
+
+$$\frac{1}{(1-x)} = 1 + x + x^2 + x^3 + x^4 +\ ...$$
+
+Thus, Taylor Series expansion results in
+
+$$f(x) = \frac{1}{(1-x)} = \sum_{n=0}^{\infty}x^n$$
+
+According to Key Idea 8.8.1, interval of convergence: $(-1,1)$
+
+## Function 2
+
+$$f(x) = e^x$$
+
+Let's find some derivatives ... note: the derivative of $e^x$ is always $e^x$
+
+$$f'(x) = e^x$$
+
+$$f''(x) = e^x$$
+
+$$f'''(x) = e^x$$
+
+$$f^{(4)}(x) = e^x$$
+
+Thus, we get
+
+$$e^x = e^a + \frac{e^a}{1!}(x-a) + \frac{e^a}{2!}(x-a)^2 + \frac{e^a}{3!}(x-a)^3 + \frac{e^a}{4!}(x-a)^4 +\ ...$$
+
+Again, let's select $a=0$
+
+$$e^x = e^0 + \frac{e^0}{1!}(x-0) + \frac{e^0}{2!}(x-0)^2 + \frac{e^0}{3!}(x-0)^3 + \frac{e^0}{4!}(x-0)^4 +\ ...$$
+
+Simplify
+
+$$e^x = 1 + \frac{1}{1!}(x) + \frac{1}{2!}(x)^2 + \frac{1}{3!}(x)^3 + \frac{1}{4!}(x)^4 +\ ...$$
+
+Simplify some more
+
+$$e^x = 1 + \frac{x}{1!} + \frac{x^2}{2!} + \frac{x^3}{3!} + \frac{x^4}{4!} +\ ...$$
+
+Thus, Taylor Series expansion results in
+
+$$f(x) = e^x = \sum_{n=0}^{\infty}\frac{x^n}{n!}$$
+
+According to Key Idea 8.8.1, interval of convergence: $(-\infty,\infty)$
+
+## Function 3
+
+$$f(x) = \ln(1+x)$$
+
+Take the first few derivatives
+
+$$f'(x) = \frac{1}{1+x}$$
+
+$$f''(x) = -\frac{1}{(1+x)^2}$$
+
+$$f'''(x) = \frac{2}{(1+x)^3}$$
+
+$$f^{(4)}(x) = -\frac{6}{(1+x)^4}$$
+
+Thus, we get
+
+$$\ln(1+x) = \ln(1+a) + \frac{\frac{1}{1+a}}{1!}(x-a) + \frac{-\frac{1}{(1+a)^2}}{2!}(x-a)^2 + \frac{\frac{2}{(1+a)^3}}{3!}(x-a)^3 + \frac{-\frac{6}{(1+a)^4}}{4!}(x-a)^4 +\ ...$$
+
+Again, let's select $a=0$
+
+$$\ln(1+x) = \ln(1+0) + \frac{\frac{1}{1+0}}{1!}(x-0) + \frac{-\frac{1}{(1+0)^2}}{2!}(x-0)^2 + \frac{\frac{2}{(1+0)^3}}{3!}(x-0)^3 + \frac{-\frac{6}{(1+0)^4}}{4!}(x-0)^4 +\ ...$$
+
+Simplify
+
+$$\ln(1+x) = \ln(1) + \frac{1}{1!}(x) - \frac{1}{2!}(x)^2 + \frac{2}{3!}(x)^3 - \frac{6}{4!}(x)^4 +\\ ...$$
+
+Simplify some more
+
+$$\ln(1+x) = 0 + x - \frac{x^2}{2!} + \frac{2x^3}{3!} - \frac{6x^4}{4!} +\ ...$$
+
+Simplify even more
+
+$$\ln(1+x) = 0 + x - \frac{x^2}{2} + \frac{x^3}{3} - \frac{x^4}{4} +\ ...$$
+
+And because the first term is zero, we can build the summation without it and thus start with $n=1$
+
+$$\ln(1+x) = x - \frac{x^2}{2} + \frac{x^3}{3} - \frac{x^4}{4} +\ ...$$
+
+Thus, Taylor Series expansion results in
+
+$$f(x) = \ln(1+x) = \sum_{n=1}^{\infty}\frac{(-1)^{(n+1)}x^n}{n}$$

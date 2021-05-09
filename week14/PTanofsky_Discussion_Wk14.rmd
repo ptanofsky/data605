@@ -1,0 +1,78 @@
+---
+title: "DATA 605 Discussion Week 14"
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: html_document
+---
+
+# Prompt
+
+Pick any exercise in 8.8 of the calculus textbook.  Solve and post your solution.  If you have issues doing so, discuss them. 
+
+# Exercise 8.8.3
+
+Key Idea 8.8.1 gives the $n^{th}$ term of the Taylor series of common functions. In Exercises 3–6, verify the formula given in the Key Idea by finding the first few terms of the Taylor series of the given function and identifying a pattern.
+
+$$f(x)=e^x; c=0$$
+
+## From Key Idea 8.8.1
+
+#### Function and series
+
+$$e^x = \sum_{n=0}^{\infty}\frac{x^n}{n!}$$
+
+#### First Few Terms
+
+$$1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + ...$$
+
+#### Interval of Convergence
+
+$$(-\infty, \infty)$$
+**Note:** The derivative of $e^x$ is also $e^x$
+
+$$f(x) = e^x,\ thus\ f'(x) = e^x\ and\ f''(x) = e^x $$
+So that being confirmed, then
+
+$$f(0)= 1 = f'(0) = f''(0) = f'''(0) = f''''(0)$$
+As the question defines the center at 0, this will follow a Maclaurin series.
+
+#### Maclaurin polynomial of degree n of f:
+
+$$p_n(x) = f(0) + f'(0)x + \frac{f''(0)}{2!}x^2 + \frac{f'''(0)}{3!}x^3 + ... + \frac{f^n(0)}{n!}x^n$$
+So substitute for $f(0)$ and derivatives, which results in for $e^x$
+
+$$p_n(x) = 1 + x + \frac{1}{2}x^2 + \frac{1}{6}x^3 + ... + \frac{1}{n!}x^n$$
+Solving for $p_5(x)$ to approximate the value of $e$ when $x = 1$
+
+$$p_5 = 1 + x + \frac{1}{2}x^2 + \frac{1}{6}x^3 + \frac{1}{24}x^4 + \frac{1}{120}x^5$$
+Thus
+
+$$p_5(1) = 1 + x + \frac{1}{2} + \frac{1}{6} + \frac{1}{24} + \frac{1}{120} = \frac{163}{60} = 2.71667$$
+
+Given the pattern observed from $p_n(x)$, the resulting summation is equal to the key idea series from 8.8.1
+
+$$e^x = \sum_{n=0}^{\infty}\frac{x^n}{n!}$$
+
+### Solving with R
+
+Using the taylor function from the pracma library
+
+```{r}
+library(pracma)
+x <- function(x) exp(x)
+result <- taylor(x, 0, 5)
+result
+sum(result)
+```
+
+The summation `r sum(result)` equals the calculated value above.
+
+
+Helpful links:
+
+- https://www.khanacademy.org/math/ap-calculus-ab/ab-differentiation-1-new/ab-2-7/v/derivative-of-ex
+
+- https://www.khanacademy.org/math/ap-calculus-bc/bc-series-new/bc-10-14/v/taylor-series-at-0-maclaurin-for-e-to-the-x
