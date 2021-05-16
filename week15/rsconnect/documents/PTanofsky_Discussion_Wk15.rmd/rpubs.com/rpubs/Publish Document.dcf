@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/768412/ba0cc2dd40b0447a8b29938256896f71
+bundleId: https://api.rpubs.com/api/v1/document/768412/ba0cc2dd40b0447a8b29938256896f71
+url: http://rpubs.com/pstanofsky/768412
+when: 1620783886.11973

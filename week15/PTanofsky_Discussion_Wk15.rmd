@@ -1,0 +1,56 @@
+---
+title: "DATA 605 Discussion Week 15"
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: html_document
+---
+
+# Prompt 
+
+Pick any exercise in Chapter 12 of the calculus textbook.  Post the solution or your attempt.  Discuss any issues you might have had.
+
+What were the most valuable elements you took away from this course?  
+
+# Exercise 12.3.6
+
+Evaluate $f_x(x, y)$ and $f_y(x, y)$ at the indicated point.
+
+$$f(x,y) = x^3 − 3x + y^2 − 6y\ at\ (−1,3)$$
+
+## Partial Derivatives
+
+### $f_x$
+
+$$f_x(x,y) = 3x^2 − 3$$
+$$f_x(-1,3) = 3(-1)^2 − 3$$
+
+$$f_x(-1,3) = 0$$
+
+### $f_y$
+
+$$f_y(x,y) = 2y − 6$$
+
+$$f_y(-1,3) = 2(3) − 6$$
+$$f_y(-1,3) = 0$$
+
+## Confirm with R
+
+```{r warning=F, message=F}
+f_ <- expression(x**3 - 3*x + y**2 - 6*y) 
+x <- -1
+y <- 3
+
+f_x <- D(f_, "x")
+f_x
+
+f_y <- D(f_, "y")
+f_y
+
+eval(f_x)
+eval(f_y)
+```
+
+

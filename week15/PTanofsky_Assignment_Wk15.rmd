@@ -1,0 +1,158 @@
+---
+title: "DATA 605 Assignment Week 15"
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: pdf_document
+---
+
+# Exercise 1
+Find the equation of the regression line for the given points. Round any final values to the nearest hundredth, if necessary.
+
+(5.6,8.8), (6.3,12.4), (7,14.8), (7.7,18.2), (8.4,20.8)
+
+### Answer
+
+```{r warning=F, message=F}
+x <- c(5.6, 6.3, 7, 7.7, 8.4)
+y <- c(8.8, 12.4, 14.8, 18.2, 20.8)
+
+model <- lm(y~x)
+
+model
+```
+
+$$y = -14.80 + 4.28x$$
+
+# Exercise 2
+Find all local maxima, local minima, and saddle points for the function given below. Write your answer(s) in the form $(x, y, z)$. Separate multiple points with a comma.
+
+$$f(x,y)=24x-6xy^2-8y^3$$
+
+### Answer
+
+First partial derivatives
+
+$$f_x(x,y) = 24 - 6y^2$$
+$$f_y(x,y) = -12xy - 24y^2$$
+
+If $24 - 6y^2 = 0$, then $y^2 = 4$ and thus $y \pm 2$.
+
+If $y = 2$ and $-12xy - 24y^2 = 0$, then $-24x = 24(2^2)$ and thus $x = -4$.
+
+If $y = -2$ and $-12xy - 24y^2 = 0$, then $24x = 24(2^2)$ and thus $x = 4$.
+
+Now, calculate $f(x,y)$.
+
+$$f(4,-2) = 24(4) - 6(4)(-2^2) - 8(-2^3)$$
+$$= 96 - 96 + 64$$
+$$f(4,-2) = 64$$
+$$f(-4,2) = 24(-4) - 6(-4)(2^2) - 8(2^3)$$
+$$= -96 + 96 - 64$$
+$$f(-4,2) = -64$$
+
+Two Critical Points
+$(4, -2, 64)$ and $(-4,2,-64)$
+
+Now, use the Second Derivative Test to determine if the points are local maxima, local minima, or saddle points.
+
+Second Derivatives
+
+$f_{xx} = 0$ and $f_{yy} = -12x - 48y$ and $f_{xy} = -12y$
+
+Consider
+
+$$D(x,y) = f_{xx}f_{yy} - f_{xy}^2$$
+$$= (0)(-12x - 48y) - (-12y)^2$$
+$$= -144y^2$$
+$D(x,y) < 0$ for all $(x, y)$, thus any critical point is a saddle points.
+
+Therefore both critical points $(4, -2)$ and $(-4, 2)$ are saddle points.
+
+# Exercise 3
+A grocery store sells two brands of a product, the "house" brand and a "name" brand. The manager estimates that if she sells the "house" brand for $x$ dollars and the "name" brand for $y$ dollars, she will be able to sell $81-21x+17y$ units of the "house" brand and $40+11x-23y$ units of the "name" brand.
+
+## Step 1
+
+Find the revenue function $R (x, y)$.
+
+### Answer
+
+House Brand
+$$R(x) = (81-21x+17y) \times x$$
+
+Name Brand
+$$R(y) = (40+11x-23y) \times y$$
+Combine $R(x)$ and $R(y)$ to create revenue function $R(x,y)$
+
+$$R(x,y) = R(x) + R(y)$$
+$$= (81-21x+17y)x + (40+11x-23y)y$$
+$$= 81x-21x^2+17yx + 40y+11xy-23y^2$$
+$$R(x,y) = 28xy - 21x^2 - 23y^2 + 81x + 40y$$
+
+## Step 2
+What is the revenue if she sells the "house" brand for \$2.30 and the "name" brand for \$4.10?
+
+### Answer
+```{r warning=F, message=F}
+#house price
+house <- 2.3
+#name price
+name <- 4.1
+
+revenue <- function(x, y) {
+  return ((28 * x * y) - (21 * x**2) - (23 * y**2) + (81 * x) + (40 * y))
+}
+
+revenue(house, name)
+```
+
+Total revenue: $`r revenue(house, name)`.
+
+# Exercise 4
+A company has a plant in Los Angeles and a plant in Denver. The firm is committed to produce a total of 96 units of a product each week. The total weekly cost is given by $C(x,y)=\frac{1}{6}x^2 + \frac{1}{6}y^2 + 7x + 25y + 700$, where $x$ is the number of units produced in Los Angeles and $y$ is the number of units produced in Denver. How many units should be produced in each plant to minimize the total weekly cost?
+
+$$C(x,y)=\frac{1}{6}x^2 + \frac{1}{6}y^2 + 7x + 25y + 700$$
+
+### Answer
+
+From the prompt, $x + y = 96$, thus $x = 96 - y$.
+
+$$C(x,y) = C(96-y,y)$$
+$$=\frac{1}{6}x^2 + \frac{1}{6}y^2 + 7x + 25y + 700$$
+$$=\frac{1}{6}(96-y)^2 + \frac{1}{6}y^2 + 7(96-y) + 25y + 700$$
+$$=\frac{1}{6}(y^2-192y + 9216) + \frac{1}{6}y^2 + 672 - 7y + 25y + 700$$
+$$=\frac{1}{6}y^2 - 32y + 1536 + \frac{1}{6}y^2 + 18y + 1372$$
+$$C(y)=\frac{1}{3}y^2 - 14y + 2908$$
+
+Now, to find the minimal value, let's take the derivative at set that to zero:
+
+$$C'(y) = \frac{2}{3}y - 14$$
+$$0 = \frac{2}{3}y - 14$$
+$$0 = \frac{2}{3}y - 14$$
+$$21 = y$$
+
+Denver should produce 21 units. Thus LA should produce (x = 96 - y ... x = 96 - 21) 75 units.
+
+
+# Exercise 5
+Evaluate the double integral on the given region.
+
+$$\iint (e^{8x+3y})\ dA;R:2 \leq x \leq 4\ and\ 2 \leq y \leq 4$$
+
+Write your answer in exact form without decimals.
+
+### Answer
+
+$$\int_2^4 \int_2^4 (e^{8x+3y})\ dy\ dx$$
+$$= \int_2^4 \bigg(\bigg[\frac{1}{3}e^{8x+3y}\bigg]\bigg|_2^4\bigg)\ dx$$
+$$= \int_2^4 \bigg(\bigg[\frac{1}{3}e^{8x+12}\bigg]-\bigg[\frac{1}{3}e^{8x+6}\bigg]\bigg)\ dx$$
+$$= \int_2^4 \bigg(\frac{1}{3}e^{8x+6}\bigg[e^{6}-1\bigg]\bigg)\ dx$$
+$$= \bigg(\frac{1}{24}e^{8x+6}\bigg[e^{6}-1\bigg]\bigg)\bigg|_2^4$$
+
+$$= \frac{1}{24}e^{38}(e^{6}-1)-\frac{1}{24}e^{22}(e^{6}-1)$$
+$$= \frac{1}{24}(e^{38}-e^{22)}(e^{6}-1)$$
+$$= \frac{1}{24}(e^{44}-e^{38}-e^{28}+e^{22})$$
+
