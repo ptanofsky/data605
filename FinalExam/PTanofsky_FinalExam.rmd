@@ -1,0 +1,555 @@
+---
+title: "DATA 605 Final Exam"
+subtitle: 'CUNY Spring 2021'
+author: "Philip Tanofsky" 
+date: "`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+   - \usepackage{amsmath}
+output: pdf_document
+---
+
+# Final Exam: Computational Mathematics
+
+## Problem 1
+
+Using R, generate a random variable $X$ that has 10,000 random uniform numbers from 1 to N, where N can be any number of your choosing greater than or equal to 6.  Then generate a random variable $Y$ that has 10,000 random normal numbers with a mean of $\mu = \sigma=(N+1)/2$.
+
+```{r warning=F, message=F}
+set.seed(1234)
+
+N <- 10
+n <- 10000
+mu <- (N + 1) / 2
+sigma <- mu
+
+X <- runif(n, min=1, max=N)
+Y <- rnorm(n, mean=mu, sd=mu)
+
+x <- quantile(Y, 0.5)
+y <- quantile(Y, 0.25)
+```
+
+### Probability
+
+Calculate as a minimum the below probabilities a through c.  Assume the small letter "x" is estimated as the median of the $X$ variable, and the small letter "y" is estimated as the 1st quartile of the $Y$ variable.  Interpret the meaning of all probabilities.
+
+#### A.
+
+$$P(X>x\ |\ X>y)$$
+
+$$P(A|B) = \frac{P(A\cap B)}{P(B)}$$
+
+
+The probability of the intersection of events A and B divided by the probability of B
+
+
+```{r warning=F, message=F}
+p.int.a.b <- length(which(X > x & X > y)) / n
+p.b <- length(which(X > y)) / n
+#p.int.a.b
+#p.b
+
+result.a <- p.int.a.b / p.b
+#result.a
+```
+
+Answer: `r result.a`.
+
+#### B.
+
+$$P(X>x, Y>y)$$
+
+The probability of events A and B.
+
+```{r warning=F, message=F}
+
+p.a.b <- length(which(X > x & Y > y)) / n
+result.b <- p.a.b
+#result.b
+
+
+```
+
+Answer: `r result.b`.
+
+#### C.
+
+$$P(X<x\ |\ X>y)$$
+
+The probability of the intersection of events A and B divided by the probability of B. (See part A for definition.)
+
+```{r warning=F, message=F}
+p.int.a.b <- length(which(X < x & X > y)) / n
+p.b <- length(which(X > y)) / n
+#p.int.a.b
+#p.b
+
+result.c <- p.int.a.b / p.b
+#result.c
+```
+
+Answer: `r result.c`.
+
+### Build a Table
+
+Investigate whether $P(X>x\ and\ Y>y)=P(X>x)*P(Y>y)$ by building a table and evaluating the marginal and joint probabilities.
+
+$P(A\ and\ B) = P(A) * P(B)$ for independent events
+
+```{r warning=F, message=F}
+p.x.y <- length(which(X > x & Y > y)) / n
+p.x.not.y <- length(which(X > x & Y < y)) / n
+p.not.x.y <- length(which(X < x & Y > y)) / n
+p.not.x.not.y <- length(which(X < x & Y < y)) / n
+
+table <- matrix(c(p.x.y, p.not.x.y, sum(p.x.y + p.not.x.y), 
+                   p.x.not.y, p.not.x.not.y, sum(p.x.not.y + p.not.x.not.y),
+                   sum(p.x.y + p.x.not.y), sum(p.not.x.y + p.not.x.not.y), sum(p.x.y + p.not.x.y + p.x.not.y + p.not.x.not.y)),
+                nrow=3, ncol=3, byrow=T,
+                dimnames=list(c('Y>y', 'Y<y', 'Marginal'), c('X>x', 'X<x', 'Marginal')))
+table
+
+x.and.y <- sum(p.x.y + p.x.not.y) * sum(p.x.y + p.not.x.y)
+x.and.y
+```
+
+The multiplication of marginal probabilities results in `r x.and.y` for $P(A) * P(B)$ which is quite close to 0.3695, the joint probability for $P(A\ and\ B)$, a difference of 0.00145. Thus, in practice the definition of probability stands anecdotally.
+
+### Check Independence
+
+Check to see if independence holds by using Fisher's Exact Test and the Chi Square Test.  What is the difference between the two? Which is most appropriate?
+
+#### Fisher's Exact Test
+
+```{r warning=F, message=F}
+tab.ind <- table(X > x, Y > y)
+fisher.test(tab.ind)
+```
+
+The Fisher test results in p-value of 0.5031, thus we cannot reject the null hypothesis. The null hypothesis states that the variables are independent.
+
+#### Chi Square Test
+
+```{r warning=F, message=F}
+chisq.test(tab.ind)
+```
+
+The Chi-squared test results in p-value of 0.5178, thus we cannot reject the null hypothesis. The null hypothesis states that the variables are independent.
+
+The Fisher test is exact and typically used when the sample size is small. The Chi-squared test is an approximation for when the samples becomes infinite, and thus more applicable for larger sample sizes. A rule of thumb, the Chi-squared test is not applicable when the expected values in the one of the contingency table cells is less than 5. That scenario does not apply to this contingency table.
+
+Given the size of the sample size, I recommend the Chi-squared test for independence. The p-value results for both tests were quite close, so in this particular scenario both tests of independence are acceptable.
+
+## Problem 2
+
+You are to register for Kaggle.com (free) and compete in the House Prices: Advanced Regression Techniques competition.  https://www.kaggle.com/c/house-prices-advanced-regression-techniques.
+
+
+```{r warning=F, message=F}
+library(ggplot2)
+library(tidyverse)
+df_train <- read_csv("KaggleCompetition/house-prices-advanced-regression-techniques/train.csv")
+#df_test <- read_csv("KaggleCompetition/house-prices-advanced-regression-techniques/test.csv")
+```
+
+### Descriptive and Inferential Statistics
+
+Provide univariate descriptive statistics and appropriate plots for the training data set.  Provide a scatterplot matrix for at least two of the independent variables and the dependent variable. Derive a correlation matrix for any three quantitative variables in the dataset.  Test the hypotheses that the correlations between each pairwise set of variables is 0 and provide an 80% confidence interval.  Discuss the meaning of your analysis.  Would you be worried about familywise error? Why or why not?
+
+```{r warning=F, message=F}
+summary(df_train)
+```
+
+Above is the initial, high-level summary of the training dataset from Kaggle. Later, I will transform character variables to factor and also account for missing data.
+
+### Univariate statistics and plots
+
+Selecting 4 popular variables in describing houses for sale: lot area (LotArea), above ground living area square feet (GrLivArea), total rooms above grade (TotRmsAbvGrd), and year built (YearBuilt) along with the dependent variable sale price (SalePrice).
+
+Lot area shows a minimum of 1300 square feet and over 200,000 square feet with a mean of 10,517. The histogram shows a near normal distribution when applying log to the lot area values.
+
+```{r warning=F, message=F}
+summary(df_train$LotArea)
+
+# Lot Area
+ggplot(df_train, aes(LotArea)) +
+  geom_histogram() +
+  scale_x_continuous(trans="log")
+```
+
+The above ground living area as measured in square feet indicates a minimum of 334 and a maximum of 5,642 and mean of 1,515. The histogram also shows a near normal distribution once applying log to the ground living area values.
+
+```{r warning=F, message=F}
+summary(df_train$GrLivArea)
+# Above ground living area
+ggplot(df_train, aes(GrLivArea)) +
+  geom_histogram() +
+  scale_x_continuous(trans="log")
+```
+
+Total rooms above grade indicates a minimum of 2 and a maximum of 14 (must be nice) along with a mean of 6.5. The histogram shows a near normal distribution, interestingly the right skew of this plot doesn't match the left skew of the total living area plot above.
+
+```{r warning=F, message=F}
+summary(df_train$TotRmsAbvGrd)
+# Bedroom Above Ground
+ggplot(df_train, aes(TotRmsAbvGrd)) +
+  geom_histogram()
+#  scale_x_continuous(trans="log")
+```
+
+Year built is numerical and can be considered quantitative. With that in mind, the minimum year is 1872 with a maximum of 2010. The median year is 1973. The histogram show a spike in the 1960s and 1970s, followed by a dip in the 1980s and then another large spike in the 1990s and 2000s. Not expecting a normal distribution given the nature of the year variable.
+
+```{r warning=F, message=F}
+summary(df_train$YearBuilt)
+# Year built
+ggplot(df_train, aes(YearBuilt)) +
+  geom_histogram()
+#  scale_x_continuous(trans="log")
+```
+
+Finally, in assessing the dependent variable SalePrice, the minimum value is 34,900 and the maximum of 755,000. I had to look it up, the dataset represents houses sold between 2006 and 2010 in Ames, Iowa. With the current housing market, I couldn't imagine a maximum house for less than one million dollars. The dataset is 11 years old, so I'll allow it. Overall, the histogram shows an almost normal distribution for the sale prices. A good sign for the later regression modeling to be performed.
+
+```{r warning=F, message=F}
+summary(df_train$SalePrice)
+# Sale Price
+ggplot(df_train, aes(SalePrice)) +
+  geom_histogram() +
+  scale_x_continuous(trans="log")
+```
+
+#### Scatterplots
+
+Scatterplots compare the 4 selected independent variables against the dependent variable of SalePrice.
+
+The SalePrice by LotArea scatterplot does show a positive linear relationship with the log applied to the LotArea. But visual inspection does show quite a cluster of instances, so even though the plot shows a linear relationship, this variable may not be the most valuable.
+
+```{r warning=F, message=F}
+ggplot(df_train, aes(x=LotArea, y=SalePrice)) + 
+  geom_point() +
+  scale_x_continuous(trans="log") +
+  geom_smooth(method=lm)
+```
+
+The SalePrice by GrLivArea scatterplot shows a very clear positive linear relationship between the values with the log applied to the GrLivArea variable. Using total above ground living area as a predictor of sale prices appears to be a good hypothesis.
+
+```{r warning=F, message=F}
+ggplot(df_train, aes(x=GrLivArea, y=SalePrice)) + 
+  geom_point() +
+  scale_x_continuous(trans="log") +
+  geom_smooth(method=lm)
+```
+
+The SalePrice by TotRmsAbvGrd appears very similar to the above plot for GrLivArea with a positive linear relationship. I would expect the variables of TotRmsAbvGrd and GrLivArea to be highly correlated variables.
+
+```{r warning=F, message=F}
+ggplot(df_train, aes(x=TotRmsAbvGrd, y=SalePrice)) + 
+  geom_jitter() +
+  geom_smooth(method=lm)
+```
+
+Finally, a scatterplot of SalePrice by YearBuilt show a slightly positive linear relationship with outliers more likely to appear above the linear regression line. Given the shape of the scatterplot, YearBuilt may be valuable in predicting SalePrice.
+
+```{r warning=F, message=F}
+ggplot(df_train, aes(x=YearBuilt, y=SalePrice)) + 
+  geom_jitter() +
+  geom_smooth(method=lm)
+```
+
+#### Correlation matrix
+
+Using 3 of the 4 selected variables above, a correlation matrix is derived with GrLivArea, LotArea, and TotRmsAbvGrd.
+
+```{r warning=F, message=F}
+cols <- c("GrLivArea", "LotArea", "TotRmsAbvGrd")
+
+cor.mat <- cor(df_train[cols])
+cor.mat
+```
+
+Using Pearson's algorithm for correlation, the correlation between GrLivArea and LotArea is not equal to 0, and the 80 percent confidence interval is 0.2315997 to 0.2940809. This would appear to be a moderate correlation.
+
+```{r warning=F, message=F}
+cor.test.1 <- cor.test(df_train$GrLivArea, df_train$LotArea, method="pearson", conf.level=0.8)
+cor.test.1
+```
+
+Using Pearson's algorithm for correlation, the correlation between GrLivArea and TotRmsAbvGrd is not equal to 0, and the 80 percent confidence interval is 0.8144931 to 0.8358928. As expected, this would appear to be a strong correlation.
+
+```{r warning=F, message=F}
+cor.test.2 <- cor.test(df_train$GrLivArea, df_train$TotRmsAbvGrd, method="pearson", conf.level=0.8)
+cor.test.2
+```
+
+Using Pearson's algorithm for correlation, the correlation between LotArea and TotRmsAbvGrd is not equal to 0, and the 80 percent confidence interval is 0.1574573 to 0.2221597. This would appear to be a moderate to weak correlation.
+
+```{r warning=F, message=F}
+cor.test.3 <- cor.test(df_train$LotArea, df_train$TotRmsAbvGrd, method="pearson", conf.level=0.8)
+cor.test.3
+```
+
+As the results of the 3 correlation tests above indicate, the p-value is quite small indicating correlation between each set of variables, rejecting the null hypothesis that true correlation is zero. Given the very small values for each p-value, one should not worry about familywise error.
+
+### Linear Algebra and Correlation
+
+Invert your correlation matrix from above. (This is known as the precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix. Conduct LU decomposition on the matrix.
+
+Create precision matrix by inverting correlation matrix.
+
+```{r warning=F, message=F}
+# Invert your correlation matrix from above
+inv.cor.mat <- solve(cor.mat)
+inv.cor.mat
+```
+
+Multiply the correlation matrix by the precision matrix. Apply the zapsmall to allow for interpretability. Results in the identity matrix.
+
+```{r warning=F, message=F}
+# Multiply the correlation matrix by the precision matrix
+cor.by.prec <- cor.mat %*% inv.cor.mat
+#cor.by.prec
+
+cor.by.prec <- zapsmall(cor.by.prec)
+cor.by.prec
+```
+
+Multiply the precision matrix by the correlation matrix, and again apply the zapsmall function. Again, results in identity matrix.
+
+```{r warning=F, message=F}
+# multiply the precision matrix by the correlation matrix
+prec.by.cor <- inv.cor.mat %*% cor.mat
+#prec.by.cor
+
+prec.by.cor <- zapsmall(prec.by.cor)
+prec.by.cor
+```
+
+Conduct LU decomposition on the matrix. Output the lower triangular matrix.
+
+```{r warning=F, message=F}
+library(matrixcalc)
+# Conduct LU decomposition on the matrix
+lu.de <- lu.decomposition(cor.mat)
+
+lower <- lu.de$L
+lower
+```
+
+Output the upper triangular matrix.
+
+```{r warning=F, message=F}
+upper <- lu.de$U
+upper
+```
+
+To confirm accuracy of LU decomposition, multiply to the lower and upper triangular matrices to return to initial correlation matrix.
+
+```{r warning=F, message=F}
+res <- lower %*% upper
+res
+cor.mat
+```
+
+### Calculus-Based Probability & Statistics
+Many times, it makes sense to fit a closed form distribution to data.  Select a variable in the Kaggle.com training dataset that is skewed to the right, shift it so that the minimum value is absolutely above zero if necessary.  Then load the MASS package and run $fitdistr$ to fit an exponential probability density function.  (See https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/fitdistr.html ).  Find the optimal value of $\lambda$ for this distribution, and then take 1000 samples from this exponential distribution using this value (e.g., $rexp(1000, \lambda)$).  Plot a histogram and compare it with a histogram of your original variable.   Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF).   Also generate a 95% confidence interval from the empirical data, assuming normality.  Finally, provide the empirical 5th percentile and 95th percentile of the data.  Discuss.
+
+Select variable OpenPorchSF which is skewed to the right. The values are shifted by positive one to ensure that the minimum value is absolutely above zero. The shift of +1 results in the mean and median values being one greater than the initial data and no change to the standard deviation of the variable values.
+
+The histogram of the shifted variable confirms the right skew. The summary of the shifted variable shows the minimum of 1 and the maximum of 548.
+
+```{r warning=F, message=F}
+# Select a variable in the Kaggle.com training dataset that is skewed to the right
+# OpenPorchSF
+
+open.por <- df_train$OpenPorchSF
+open.por <- open.por + 1
+
+hist(open.por)
+
+summary(open.por)
+```
+
+Run function fitdistr from the MASS package to fit an exponential probability density function (PDF)
+
+```{r warning=F, message=F}
+# Then load the MASS package and run fitdistr to fit an exponential probability density function (PDF)
+library(MASS)
+set.seed(1234)
+exp.pdf <- fitdistr(open.por, densfun="exponential")
+```
+
+The optimal value of lambda for the distribution is the estimate attribute from the fitdistr response. The value is output below.
+
+```{r warning=F, message=F}
+# Find the optimal value of lambda for this distribution
+exp.pdf$estimate
+lambda <- exp.pdf$estimate
+```
+
+Generate 1000 samples using the lambda value.
+
+```{r warning=F, message=F}
+# then take 1000 samples from this exponential distribution using this value
+samples <- rexp(1000, lambda)
+```
+
+The below histogram based on the 1000 samples shows a decreased range of values across the x-axis along with a less concentrated count along the y-axis. Yes, the new histogram is still right skewed, but not to same the degree. From visual inspection, the second bucket of the below histogram is much closer to half of the first bucket as compared to the initial histogram. Overall the data is a bit more uniformly distributed, though not all completely uniform, nor normal, and the range of values has decreased by almost half.
+
+```{r warning=F, message=F}
+# Plot a histogram and compare it with a histogram of your original variable.
+hist(samples)
+```
+
+Given the lambda of the exponential PDF, the 5th percentile is 2.444652 and the 95th percentile is 142.7774.
+
+```{r warning=F, message=F}
+# Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function
+qexp(.05, rate=lambda, lower.tail=T)
+qexp(.95, rate=lambda, lower.tail=T)
+```
+
+Using the initial data, generating the 95% confidence interval assuming normality using the function qnorm along with the t.test function. For function qnorm the 95% confidence interval would be 44.2617 to 51.05885, quite close to result from t.test.
+
+```{r warning=F, message=F}
+# Generate a 95% confidence interval from the empirical data, assuming normality.
+mean <- mean(open.por)
+sd <- sd(open.por)
+error <- qnorm(0.975)*sd/sqrt(length(open.por))
+left <- mean - error
+right <- mean + error
+
+left
+right
+
+t.test(open.por)
+```
+
+The 5th percentile for the shifted empirical data is 1.00 and the 95th percentile is 176.05. Much different compared to the 95% confidence interval if the data were normal. With the exponential distribution, the skewed data provided realistic results while the normal data clearly did not match the skew of the original variable values.
+
+```{r warning=F, message=F}
+# Provide the empirical 5th percentile and 95th percentile of the data.
+quantile(open.por, c(0.05, 0.95))
+```
+
+### Modeling
+
+Build some type of multiple regression model and submit your model to the competition board. Provide your complete model summary and results with analysis.  Report your Kaggle.com user name and score.
+
+##### Approach
+
+To find the best multiple regression model, I used an abbreviated backward elimination step approach. I started with every variable and upon the first model, removed all the variables with a significance greater than 0 and less than 0.001. Then, I continued to remove all variables that did not meet the same significance criteria until all independent variables had the same significance. But, for the final model below, I did add the variable Neighborhood back into the model as an attempt to improve my score, which did it. In the end, the below model sure isn't the simplest model, but fared well according to my standards and did pare down the overall list of variables.
+
+To prepare the training and test data, I did convert all character variables to factor data type and set all missing numeric entries to zero, except for missing GarageYrBlt in which I just use the YearBuilt value as a replacement. As noted below, the test dataset had many more columns with missing data requiring data imputation
+
+```{r warning=F, message=F}
+# First submitted to Kaggle
+# Adjusted R-squared:  0.5018
+# Naive approach based soly on the ground living area
+#mod_lm <- lm(SalePrice ~ GrLivArea, data=df_train)
+
+# Read in Train and Test again
+df_train <- read_csv("KaggleCompetition/house-prices-advanced-regression-techniques/train.csv")
+df_test <- read_csv("KaggleCompetition/house-prices-advanced-regression-techniques/test.csv")
+
+# For Train
+df_train$LotFrontage <- replace(df_train$LotFrontage, is.na(df_train$LotFrontage), 0)
+df_train$MasVnrArea <- replace(df_train$MasVnrArea, is.na(df_train$MasVnrArea), 0)
+df_train$GarageYrBlt <- replace(df_train$GarageYrBlt, is.na(df_train$GarageYrBlt), df_train$YearBuilt)
+
+# For Test
+df_test$LotFrontage <- replace(df_test$LotFrontage, is.na(df_test$LotFrontage), 0)
+df_test$MasVnrArea <- replace(df_test$MasVnrArea, is.na(df_test$MasVnrArea), 0)
+df_test$BsmtFinSF1 <- replace(df_test$BsmtFinSF1, is.na(df_test$BsmtFinSF1), 0)
+df_test$BsmtFinSF2 <- replace(df_test$BsmtFinSF2, is.na(df_test$BsmtFinSF2), 0)
+df_test$BsmtUnfSF <- replace(df_test$BsmtUnfSF, is.na(df_test$BsmtUnfSF), 0)
+df_test$TotalBsmtSF <- replace(df_test$TotalBsmtSF, is.na(df_test$TotalBsmtSF), 0)
+df_test$BsmtFullBath <- replace(df_test$BsmtFullBath, is.na(df_test$BsmtFullBath), 0)
+df_test$BsmtHalfBath <- replace(df_test$BsmtHalfBath, is.na(df_test$BsmtHalfBath), 0)
+df_test$GarageCars <- replace(df_test$GarageCars, is.na(df_test$GarageCars), 0)
+df_test$GarageArea <- replace(df_test$GarageArea, is.na(df_test$GarageArea), 0)
+df_test$GarageYrBlt <- replace(df_test$GarageYrBlt, is.na(df_test$GarageYrBlt), df_test$YearBuilt)
+
+# Convert all character fields to factor
+df_train[is.na(df_train)] <- "Not Found"
+df_train <- df_train %>% mutate_if(is.character,as.factor)
+
+df_test[is.na(df_test)] <- "Not Found"
+df_test <- df_test %>% mutate_if(is.character,as.factor)
+df_test$KitchenQual[df_test$KitchenQual == "Not Found"] <- "TA"
+
+#mod_lm.all <- lm(SalePrice ~ ., data=df_train)
+# Adjusted R-squared:  0.9192
+
+#mod_lm <- lm(SalePrice ~ LotArea + LandSlope + Neighborhood + Condition1 + Condition2 + OverallQual + OverallCond + RoofMatl + MasVnrArea + ExterQual + BsmtQual + BsmtExposure + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + `1stFlrSF` + `2ndFlrSF` + KitchenQual, data=df_train)
+# Adjusted R-squared:  0.8914
+#PST_052321_03.csv
+# Kaggle score: 0.16268 (Best score)
+
+# mod_lm <- lm(SalePrice ~ LotArea + LandSlope + Neighborhood + OverallQual + OverallCond + RoofMatl + ExterQual + BsmtQual + BsmtExposure + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + `1stFlrSF` + `2ndFlrSF` + KitchenQual, data=df_train)
+# Adjusted R-squared:  0.8802
+```
+
+The above commented out models were used during the development, but for the final model summary were not selected even though my best Kaggle score is noted in one of the models above.
+
+Based on the final model formula, I wanted to check the correlation between all the numeric values. Overall, the correlation values are near zero except for BsmtUnfSF and BsmtFinSF1, which score a correlation of -0.5. Based on the low correlation of all the variables below, they are included in the final formula.
+
+```{r warning=F, message=F}
+library(dplyr)
+library(ggcorrplot)
+df_train.abbr <- df_train %>% dplyr::select(LotArea, BsmtFinSF1, BsmtFinSF2, BsmtUnfSF, `1stFlrSF`, `2ndFlrSF`)
+
+corr <- round(cor(df_train.abbr), 1)
+head(corr)
+ggcorrplot(corr)
+```
+
+The final linear regression model is generated and displayed in summary. The model contains both numeric and factor variables. As the model summary shows, the factor variables are converted into dummy variables by the lm function.
+
+```{r warning=F, message=F}
+mod_lm <- lm(SalePrice ~ Neighborhood + LotArea + OverallQual + OverallCond + RoofMatl + ExterQual + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF + `1stFlrSF` + `2ndFlrSF` + KitchenQual, data=df_train)
+# Adjusted R-squared:  0.8664
+
+summary(mod_lm)
+```
+
+Assessing the residuals: With a goal of matching a normal distribution, the median isn't quite at 0, so the center of the distribution is off. The 1st and 3rd quartile are almost the same, so a good sign for the normal nature. The min and max values are not close, but given the large range, I do believe they are similar in magnitude.
+
+Assessing the standard error and the corresponding t-value: Except for many of the Neighborhood dummy variables, the results show good t-values with absolute values of at least 5. The p-value reflects the same understanding as the t-value. The p-value of all the variables expect for some of the Neighborhood dummy variables indicate a high level of significance to the model.
+
+The Adjusted R-squared value of 0.8664 indicates the model can explain over 86% of the data's variation.
+
+Just for the sake of completeness, I did attempt to use the stepAIC function, but the result was not better than the final model presented.
+
+```{r warning=F, message=F, eval=F}
+# DO NOT RUN, THIS HAS STEPAIC, NOT WORTH IT
+mod_lm.all <- lm(SalePrice ~ ., data=df_train)
+mod_lm.aic <- stepAIC(mod_lm.all, direction="both")
+summary(mod_lm.aic)
+```
+
+The residuals plot shows most of the points along the zero x-axis, a good sign.
+
+```{r warning=F, message=F}
+plot(fitted(mod_lm),resid(mod_lm))
+```
+
+The normal Q-Q plot does indicate points diverging a bit at the two ends. Certainly, a better model exists, but the Normal Q-Q plot shows most of the points on or near the straight line.
+
+```{r warning=F, message=F}
+qqnorm(resid(mod_lm))
+qqline(resid(mod_lm))
+```
+Finally, the predictions are made with the test dataset based on the final regression model.
+
+```{r warning=F, message=F}
+preds <- predict(mod_lm, newdata=df_test)
+```
+
+```{r warning=F, message=F}
+submission <- data.frame(Id=df_test$Id, SalePrice=preds)
+
+submission %>% write_csv("PST_052321_03.csv")
+```
+
+kaggle.com username: philiptanofsky (link: https://www.kaggle.com/philiptanofsky)
+
+Top score: 0.16268 (Above model score: 0.17720)
